@@ -8,5 +8,6 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 
 | group | values | exact | max ULP | norm err |
 |---|---:|---:|---:|---:|
-| group_delay gd | 2 | 2 (100.0%) | 0 | 0.00e+00 |
-| group_delay w | 2 | 2 (100.0%) | 0 | 0.00e+00 |
+| besselap delay k | 26 | 26 (100.0%) | 0 | 0.00e+00 |
+| besselap mag k | 26 | 1 (3.8%) | 707 | 1.14e-13 |
+| besselap phase k | 26 | 26 (100.0%) | 0 | 0.00e+00 |

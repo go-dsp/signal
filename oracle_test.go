@@ -181,7 +181,7 @@ func writeStores() error {
 func TestMain(m *testing.M) {
 	flag.Parse()
 	code := m.Run()
-	if *update && code == 0 {
+	if *update {
 		if err := writeStores(); err != nil {
 			fmt.Fprintln(os.Stderr, "writing fixtures:", err)
 			code = 1

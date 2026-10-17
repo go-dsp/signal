@@ -2,6 +2,7 @@ package signal
 
 import (
 	"math"
+	"math/big"
 	"math/cmplx"
 	"math/rand/v2"
 	"sort"
@@ -118,3 +119,7 @@ func mustOK(t *testing.T, err error) {
 		t.Fatal(err)
 	}
 }
+
+type bigInt = big.Int
+
+func bigOne() *big.Int { return big.NewInt(1) }
