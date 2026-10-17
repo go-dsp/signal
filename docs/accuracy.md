@@ -8,28 +8,7 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 
 | group | values | exact | max ULP | norm err |
 |---|---:|---:|---:|---:|
-| bessel | 6 | 4 (66.7%) | 2 | 1.41e-16 |
-| butter fs | 8 | 4 (50.0%) | 4 | 3.99e-16 |
-| buttord wn | 63 | 40 (63.5%) | 2124967879 | 3.44e-07 |
-| cheb1ord wn | 63 | 49 (77.8%) | 1347072943 | 2.14e-07 |
-| cheb2ord wn | 63 | 20 (31.7%) | 1323746378 | 2.43e-07 |
-| cheby1 | 6 | 1 (16.7%) | 63 | 1.70e-16 |
-| cheby2 | 6 | 5 (83.3%) | 1 | 1.37e-16 |
-| ellip | 12 | 8 (66.7%) | 2 | 1.27e-16 |
-| ellipord wn | 63 | 49 (77.8%) | 1243567211 | 1.97e-07 |
-| iirdesign analog | 16 | 12 (75.0%) | 1 | 1.33e-16 |
-| iirdesign fs | 12 | 2 (16.7%) | 2 | 1.38e-16 |
-| iirdesign k | 16 | 0 (0.0%) | 2664265013 | 3.79e-07 |
-| iirdesign poles | 354 | 107 (30.2%) | 2564931370 | 9.30e-08 |
-| iirdesign zeros | 354 | 192 (54.2%) | 1607276521 | 4.53e-08 |
-| iirfilter a | 900 | 371 (41.2%) | 768 | 7.14e-15 |
-| iirfilter b | 810 | 421 (52.0%) | 24 | 2.64e-15 |
-| iirfilter gain | 464 | 134 (28.9%) | 1091 | 1.32e-13 |
-| iirfilter high ba den | 1032 | 76 (7.4%) | 37545157 | 9.63e-12 |
-| iirfilter high ba num | 1032 | 227 (22.0%) | 339056478 | 1.17e-08 |
-| iirfilter high poles | 2016 | 788 (39.1%) | 583 | 4.51e-16 |
-| iirfilter high sos | 3024 | 2078 (68.7%) | 1538 | 4.44e-16 |
-| iirfilter high zeros | 2016 | 1694 (84.0%) | 1538 | 8.75e-16 |
-| iirfilter poles | 8808 | 3947 (44.8%) | 2794 | 3.62e-14 |
-| iirfilter sos | 8586 | 6220 (72.4%) | 207 | 2.26e-15 |
-| iirfilter zeros | 7828 | 6362 (81.3%) | 9748 | 2.74e-14 |
+| iirnotch a | 9 | 7 (77.8%) | 11 | 1.92e-16 |
+| iirnotch b | 9 | 7 (77.8%) | 11 | 1.92e-16 |
+| iirpeak a | 9 | 7 (77.8%) | 11 | 1.92e-16 |
+| iirpeak b | 9 | 9 (100.0%) | 0 | 0.00e+00 |

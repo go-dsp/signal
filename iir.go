@@ -608,3 +608,35 @@ func b2i(b bool) int {
 	}
 	return 0
 }
+
+// IIRNotch designs a second-order notch (band-reject) filter at frequency w0
+// with quality factor q (scipy.signal.iirnotch; MATLAB iirnotch). fs == 0
+// means 2, so that w0 is relative to the Nyquist frequency.
+func IIRNotch(w0, q, fs float64) (b, a []float64, err error) { return notchPeak(w0, q, fs, true) }
+
+// IIRPeak designs a second-order peaking (band-pass) filter
+// (scipy.signal.iirpeak; MATLAB iirpeak).
+func IIRPeak(w0, q, fs float64) (b, a []float64, err error) { return notchPeak(w0, q, fs, false) }
+
+func notchPeak(w0, q, fs float64, notch bool) ([]float64, []float64, error) {
+	if fs == 0 {
+		fs = 2
+	}
+	if err := validFs(fs); err != nil {
+		return nil, nil, err
+	}
+	w0 = 2 * w0 / fs
+	if w0 > 1 || w0 < 0 {
+		return nil, nil, errors.New("signal: w0 should be such that 0 < w0 < 1")
+	}
+	bw := w0 / q * math.Pi
+	w0 *= math.Pi
+	gain := 1 / (1 + math.Tan(bw/2))
+	var b []float64
+	if notch {
+		b = []float64{gain, gain * -2 * math.Cos(w0), gain}
+	} else {
+		b = []float64{1 - gain, 0, -(1 - gain)}
+	}
+	return b, []float64{1, -2 * gain * math.Cos(w0), 2*gain - 1}, nil
+}

@@ -366,3 +366,28 @@ func TestIIRDesignAnalogFs(t *testing.T) {
 		t.Error("bessel poles")
 	}
 }
+
+func TestNotchPeakOracle(t *testing.T) {
+	for _, c := range [][3]float64{{0.3, 30, 2}, {60, 25, 1000}, {0.5, 3, 2}} {
+		for i, name := range []string{"iirnotch", "iirpeak"} {
+			f := IIRNotch
+			if i == 1 {
+				f = IIRPeak
+			}
+			b, a, err := f(c[0], c[1], c[2])
+			mustOK(t, err)
+			o := MustOracle(t, "signal."+name, []any{c[0], c[1], c[2]}, nil)
+			compareVec(t, name+" b", b, o.Idx(0).F(), 1e-15)
+			compareVec(t, name+" a", a, o.Idx(1).F(), 1e-15)
+		}
+	}
+	b, _, err := IIRNotch(0.3, 30, 0)
+	mustOK(t, err)
+	if len(b) != 3 {
+		t.Error("default fs")
+	}
+	_, _, err = IIRNotch(1.5, 30, 0)
+	mustErr(t, "w0", err)
+	_, _, err = IIRPeak(0.3, 30, -1)
+	mustErr(t, "fs", err)
+}
