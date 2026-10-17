@@ -1,0 +1,4 @@
+github.com/go-fft/fft v0.27.1 h1:JrkfueLondme8Dx7M1V9azApWYe4ypZnWTmGLkhECqY=
+github.com/go-fft/fft v0.27.1/go.mod h1:GN5V4TWCjV05ECqH1ONfjFM6Z1m2shqCdssxKGqQ41s=
+github.com/go-numerics/special v0.1.0 h1:HcsebTwcNuAhFBP8RuOirO9XVmWJSrxARiOVkyeCfUk=
+github.com/go-numerics/special v0.1.0/go.mod h1:T0QKLvh32lH5Bq9wiTEvtlaFd1vaOKRGrOPgvTeYfdM=
