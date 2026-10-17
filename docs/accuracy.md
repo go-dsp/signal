@@ -8,13 +8,5 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 
 | group | values | exact | max ULP | norm err |
 |---|---:|---:|---:|---:|
-| convert/cplxpair | 220 | 220 (100.0%) | 0 | 0.00e+00 |
-| convert/cplxreal complex | 86 | 86 (100.0%) | 0 | 0.00e+00 |
-| convert/cplxreal real | 24 | 24 (100.0%) | 0 | 0.00e+00 |
-| convert/normalize | 18 | 18 (100.0%) | 0 | 0.00e+00 |
-| convert/sos2tf den | 70 | 63 (90.0%) | 2 | 1.02e-16 |
-| convert/sos2tf num | 70 | 70 (100.0%) | 0 | 0.00e+00 |
-| convert/tf2sos | 180 | 78 (43.3%) | 2484 | 1.59e-14 |
-| convert/zpk2sos | 7182 | 6934 (96.5%) | 2 | 2.69e-16 |
-| convert/zpk2tf den | 514 | 147 (28.6%) | 5424 | 3.25e-15 |
-| convert/zpk2tf num | 496 | 162 (32.7%) | 11006841 | 2.74e-15 |
+| group_delay gd | 2 | 2 (100.0%) | 0 | 0.00e+00 |
+| group_delay w | 2 | 2 (100.0%) | 0 | 0.00e+00 |
