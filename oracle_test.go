@@ -580,3 +580,14 @@ func cumsum(x []float64) []float64 {
 	}
 	return r
 }
+
+// C2 encodes a rows x cols complex128 matrix.
+func C2(a [][]complex128) any {
+	var flat []complex128
+	for _, r := range a {
+		flat = append(flat, r...)
+	}
+	c := C(flat).(c128)
+	c.Shape = []int{len(a), len(a[0])}
+	return c
+}

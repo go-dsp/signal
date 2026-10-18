@@ -8,14 +8,9 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 
 | group | values | exact | max ULP | norm err |
 |---|---:|---:|---:|---:|
-| convolve auto | 10479 | 1514 (14.4%) | 44092 | 2.52e-15 |
-| convolve direct | 10479 | 1750 (16.7%) | 44092 | 2.52e-15 |
-| convolve fft | 10479 | 820 (7.8%) | 58622 | 1.57e-15 |
-| correlate auto | 10479 | 1611 (15.4%) | 546622 | 1.79e-15 |
-| correlate direct | 10479 | 1933 (18.4%) | 546622 | 1.79e-15 |
-| correlate fft | 10479 | 795 (7.6%) | 549978 | 8.40e-16 |
-| deconvolve quot | 39 | 39 (100.0%) | 0 | 0.00e+00 |
-| deconvolve rem | 48 | 44 (91.7%) | 8709680204357828608 | 1.34e-16 |
-| fftconvolve | 10479 | 820 (7.8%) | 58622 | 1.57e-15 |
-| oaconvolve | 10479 | 863 (8.2%) | 58622 | 1.57e-15 |
-| oaconvolve long | 100598 | 4786 (4.8%) | 427609 | 1.02e-15 |
+| istft | 8137 | 2411 (29.6%) | 8759921253504906240 | 9.84e-15 |
+| istft nfft | 1024 | 213 (20.8%) | 4651 | 6.93e-16 |
+| istft roundtrip | 1000 | 293 (29.3%) | 28 | 4.73e-16 |
+| stft | 21356 | 2211 (10.4%) | 8714465278961909760 | 2.74e-15 |
+| stft f | 408 | 408 (100.0%) | 0 | 0.00e+00 |
+| stft t | 245 | 245 (100.0%) | 0 | 0.00e+00 |
