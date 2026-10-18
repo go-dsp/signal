@@ -100,8 +100,8 @@ func Firwin(numtaps int, cutoff []float64, o *FirwinOptions) ([]float64, error) 
 	if err := validFs(opt.Fs); err != nil {
 		return nil, err
 	}
-	if numtaps < 1 {
-		return nil, errors.New("signal: numtaps must be positive")
+	if numtaps < 1 || numtaps > maxAlloc {
+		return nil, errors.New("signal: numtaps must be positive and at most 2^28")
 	}
 	nyq := 0.5 * opt.Fs
 	cut := make([]float64, len(cutoff))
@@ -245,8 +245,11 @@ func Firwin2(numtaps int, freq, gain []float64, o *Firwin2Options) ([]float64, e
 	if len(freq) != len(gain) {
 		return nil, errors.New("signal: freq and gain must be of same length")
 	}
-	if numtaps < 1 {
-		return nil, errors.New("signal: numtaps must be positive")
+	if numtaps < 1 || numtaps > maxAlloc/4 {
+		return nil, errors.New("signal: numtaps must be positive and at most 2^26")
+	}
+	if opt.Nfreqs > maxAlloc {
+		return nil, errors.New("signal: nfreqs too large")
 	}
 	if opt.Nfreqs != 0 && numtaps >= opt.Nfreqs {
 		return nil, fmt.Errorf("signal: numtaps must be less than nfreqs, got numtaps=%d and nfreqs=%d", numtaps, opt.Nfreqs)
@@ -358,8 +361,8 @@ func Firls(numtaps int, bands, desired, weight []float64, fs float64) ([]float64
 	if err := validFs(fs); err != nil {
 		return nil, err
 	}
-	if numtaps%2 == 0 || numtaps < 1 {
-		return nil, errors.New("signal: numtaps must be odd and >= 1")
+	if numtaps%2 == 0 || numtaps < 1 || numtaps > 1<<14 {
+		return nil, errors.New("signal: numtaps must be odd, >= 1 and at most 16384 (dense normal equations)")
 	}
 	mm := (numtaps - 1) / 2
 	nyq := 0.5 * fs

@@ -60,14 +60,14 @@ func Remez(numtaps int, bands, desired []float64, o *RemezOptions) ([]float64, e
 		return nil, errors.New("signal: type must be bandpass, differentiator or hilbert")
 	}
 	nb := len(desired)
-	if numtaps < 2 {
-		return nil, errors.New("signal: numtaps must be at least 2")
+	if numtaps < 2 || numtaps > 1<<20 {
+		return nil, errors.New("signal: numtaps must be between 2 and 2^20")
 	}
 	if nb == 0 || len(bands) != 2*nb {
 		return nil, errors.New("signal: bands must hold a pair of edges for each desired gain")
 	}
-	if opt.MaxIter < 1 || opt.GridDensity < 1 {
-		return nil, errors.New("signal: MaxIter and GridDensity must be positive")
+	if opt.MaxIter < 1 || opt.GridDensity < 1 || opt.GridDensity > 1<<12 {
+		return nil, errors.New("signal: MaxIter must be positive and GridDensity between 1 and 4096")
 	}
 	weight := opt.Weight
 	if weight == nil {

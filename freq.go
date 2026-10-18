@@ -39,8 +39,8 @@ func (o *FreqOptions) resolve(defN int) (FreqOptions, error) {
 	if !(r.Fs > 0) || math.IsInf(r.Fs, 0) {
 		return r, errors.New("signal: Fs must be a positive finite number")
 	}
-	if r.N < 0 {
-		return r, errors.New("signal: N must be nonnegative")
+	if r.N < 0 || r.N > maxAlloc {
+		return r, errors.New("signal: N must be nonnegative and at most 2^28")
 	}
 	if r.W == nil && r.N == 0 {
 		r.N = defN

@@ -47,6 +47,7 @@ def b64(a,dt): return base64.b64encode(np.ascontiguousarray(a,dtype=dt).tobytes(
 def dec(x):
     if isinstance(x,dict):
         if 'f64' in x: return np.frombuffer(base64.b64decode(x['f64']),dtype='<f8').copy().reshape(x['shape'])
+        if 'i64' in x: return np.frombuffer(base64.b64decode(x['i64']),dtype='<i8').copy().reshape(x['shape'])
         if 'c128' in x: return np.frombuffer(base64.b64decode(x['c128']),dtype='<c16').copy().reshape(x['shape'])
         if 'tuple' in x: return tuple(dec(i) for i in x['tuple'])
         return {k:dec(v) for k,v in x.items()}
@@ -54,6 +55,7 @@ def dec(x):
     return x
 def enc(x):
     if isinstance(x,(tuple,list)): return [enc(i) for i in x]
+    if isinstance(x,dict): return {'dict':{k:enc(v) for k,v in x.items()}}
     if isinstance(x,(bool,np.bool_)): return bool(x)
     if isinstance(x,(int,np.integer,float,np.floating,complex,np.complexfloating,np.ndarray)):
         a=np.asarray(x)
@@ -209,6 +211,15 @@ type c128 struct {
 // F encodes a float64 vector for the oracle.
 func F(a []float64) any { return fShape(a, len(a)) }
 
+// I encodes an int64 vector (Python integer array).
+func I(a []int) any {
+	b := make([]byte, 8*len(a))
+	for i, v := range a {
+		binary.LittleEndian.PutUint64(b[8*i:], uint64(int64(v)))
+	}
+	return map[string]any{"i64": base64.StdEncoding.EncodeToString(b), "shape": []int{len(a)}}
+}
+
 // F2 encodes a rows x cols float64 matrix.
 func F2(a [][]float64) any {
 	var flat []float64
@@ -264,6 +275,13 @@ func decodeOut(x any) any {
 		}
 		return r
 	case map[string]any:
+		if d, ok := t["dict"]; ok {
+			m := map[string]any{}
+			for k, v := range d.(map[string]any) {
+				m[k] = decodeOut(v)
+			}
+			return m
+		}
 		var shape []int
 		for _, s := range t["shape"].([]any) {
 			shape = append(shape, int(s.(float64)))
@@ -289,6 +307,12 @@ func decodeOut(x any) any {
 
 // Idx returns the i-th element of a list response.
 func (o Out) Idx(i int) Out { return Out{o.v.([]any)[i]} }
+
+// Get returns a member of a dict response.
+func (o Out) Get(key string) Out { return Out{o.v.(map[string]any)[key]} }
+
+// Has reports whether a dict response has the member.
+func (o Out) Has(key string) bool { _, ok := o.v.(map[string]any)[key]; return ok }
 
 // Arr returns the response as an array.
 func (o Out) Arr() Arr { return o.v.(Arr) }

@@ -8,9 +8,5 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 
 | group | values | exact | max ULP | norm err |
 |---|---:|---:|---:|---:|
-| istft | 8137 | 2411 (29.6%) | 8759921253504906240 | 9.84e-15 |
-| istft nfft | 1024 | 213 (20.8%) | 4651 | 6.93e-16 |
-| istft roundtrip | 1000 | 293 (29.3%) | 28 | 4.73e-16 |
-| stft | 21356 | 2211 (10.4%) | 8714465278961909760 | 2.74e-15 |
-| stft f | 408 | 408 (100.0%) | 0 | 0.00e+00 |
-| stft t | 245 | 245 (100.0%) | 0 | 0.00e+00 |
+| decimate | 2784 | 300 (10.8%) | 561152 | 2.64e-14 |
+| upfirdn sparse | 8 | 8 (100.0%) | 0 | 0.00e+00 |

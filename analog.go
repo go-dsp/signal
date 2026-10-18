@@ -13,12 +13,20 @@ const epsilon = 2e-16 // scipy.signal's EPSILON for filter design
 
 func pow10m1(x float64) float64 { return math.Expm1(math.Ln10 * x) }
 
-var errOrder = errors.New("signal: filter order must be nonnegative")
+// maxOrder bounds the order of an analog prototype (poles are computed and
+// stored one by one); orders beyond it are numerically meaningless anyway.
+const maxOrder = 1 << 16
+
+// maxBesselOrder is the largest Bessel order: (2n-1)!!, the delay gain,
+// overflows float64 just above it.
+const maxBesselOrder = 150
+
+var errOrder = errors.New("signal: filter order must be between 0 and 65536")
 
 // ButtAP returns the zeros, poles and gain of the analog Butterworth lowpass
 // prototype of order n, with cutoff 1 rad/s (scipy.signal.buttap).
 func ButtAP(n int) (ZPK, error) {
-	if n < 0 {
+	if n < 0 || n > maxOrder {
 		return ZPK{}, errOrder
 	}
 	p := make([]complex128, n)
@@ -40,7 +48,7 @@ func prodNeg(c []complex128) complex128 {
 // Cheb1AP returns the analog Chebyshev type I lowpass prototype of order n
 // with rp dB of passband ripple, passband edge 1 rad/s (scipy.signal.cheb1ap).
 func Cheb1AP(n int, rp float64) (ZPK, error) {
-	if n < 0 {
+	if n < 0 || n > maxOrder {
 		return ZPK{}, errOrder
 	}
 	if n == 0 {
@@ -64,7 +72,7 @@ func Cheb1AP(n int, rp float64) (ZPK, error) {
 // with rs dB of stopband attenuation, stopband edge 1 rad/s
 // (scipy.signal.cheb2ap).
 func Cheb2AP(n int, rs float64) (ZPK, error) {
-	if n < 0 {
+	if n < 0 || n > maxOrder {
 		return ZPK{}, errOrder
 	}
 	if n == 0 {
@@ -200,7 +208,7 @@ func arcJacSC1(w, m float64) (float64, error) {
 // with rp dB of passband ripple and rs dB of stopband attenuation, passband
 // edge 1 rad/s (scipy.signal.ellipap).
 func EllipAP(n int, rp, rs float64) (ZPK, error) {
-	if n < 0 {
+	if n < 0 || n > maxOrder {
 		return ZPK{}, errOrder
 	}
 	if n == 0 {
@@ -455,8 +463,11 @@ func secant(f func(float64) float64, x0, tol float64) float64 {
 // BesselAP returns the analog Bessel (Thomson) lowpass prototype of order n
 // (scipy.signal.besselap).
 func BesselAP(n int, norm BesselNorm) (ZPK, error) {
-	if n < 0 {
+	if n < 0 || n > maxOrder {
 		return ZPK{}, errOrder
+	}
+	if n > maxBesselOrder {
+		return ZPK{}, errors.New("signal: Bessel order too large (the gain overflows float64 beyond 150)")
 	}
 	if norm < BesselPhase || norm > BesselMag {
 		return ZPK{}, errors.New("signal: unknown Bessel normalization")

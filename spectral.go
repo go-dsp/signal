@@ -153,8 +153,8 @@ func (o SpectralOptions) resolve(n int, d segDefaults) (segSetup, error) {
 	s.nfft = o.Nfft
 	if s.nfft == 0 {
 		s.nfft = s.nperseg
-	} else if s.nfft < s.nperseg {
-		return s, errors.New("signal: nfft must be greater than or equal to nperseg")
+	} else if s.nfft < s.nperseg || s.nfft > maxAlloc/4 {
+		return s, errors.New("signal: nfft must be at least nperseg and at most 2^26")
 	}
 	if o.Noverlap == nil {
 		s.noverlap = defOverlap(s.nperseg)
