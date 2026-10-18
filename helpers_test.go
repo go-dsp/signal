@@ -1,13 +1,26 @@
 package signal
 
 import (
+	"cmp"
 	"math"
 	"math/big"
 	"math/cmplx"
 	"math/rand/v2"
+	"slices"
 	"sort"
 	"testing"
 )
+
+// sortedKeys gives a deterministic iteration order: oracle fixtures are keyed
+// by the position of the call within the test.
+func sortedKeys[K cmp.Ordered, V any](m map[K]V) []K {
+	keys := make([]K, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	slices.Sort(keys)
+	return keys
+}
 
 func newRNG(seed uint64) *rand.Rand { return rand.New(rand.NewPCG(seed, seed^0x9e3779b97f4a7c15)) }
 

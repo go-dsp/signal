@@ -150,12 +150,13 @@ func TestCplxOracle(t *testing.T) {
 		zc, zr, err := cplxReal(in, cplxTol)
 		mustOK(t, err)
 		o := MustOracle(t, "signal._filter_design._cplxreal", []any{C(in)}, nil)
-		compareC(t, "convert/cplxreal complex", zc, toC(o.Idx(0).Arr()), 0)
-		compareVec(t, "convert/cplxreal real", zr, o.Idx(1).F(), 0)
+		// the random inputs round differently on different architectures
+		compareC(t, "convert/cplxreal complex", zc, toC(o.Idx(0).Arr()), 1e-13)
+		compareVec(t, "convert/cplxreal real", zr, o.Idx(1).F(), 1e-13)
 		pr, err := cplxPair(in, cplxTol)
 		mustOK(t, err)
 		o = MustOracle(t, "signal._filter_design._cplxpair", []any{C(in)}, nil)
-		compareC(t, "convert/cplxpair", pr, o.C(), 0)
+		compareC(t, "convert/cplxpair", pr, o.C(), 1e-13)
 	}
 	zc, zr, err := cplxReal(nil, cplxTol)
 	if err != nil || zc != nil || zr != nil {

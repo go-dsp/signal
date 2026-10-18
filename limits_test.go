@@ -6,7 +6,7 @@ import (
 )
 
 func TestAllocationLimits(t *testing.T) {
-	huge := 1 << 40
+	huge := 1 << 30 // above every limit, and still an int on 32-bit systems
 	x := make([]float64, 100)
 	for i, f := range []func() error{
 		func() error { _, e := ButtAP(huge); return e },

@@ -111,7 +111,8 @@ func TestFiltFiltOracle(t *testing.T) {
 	for _, n := range []int{2, 4, 6} {
 		b, a := butterBA(t, n, 0.25)
 		x := randVec(rng, 200)
-		for pt, name := range padNames {
+		for _, pt := range sortedKeys(padNames) {
+			name := padNames[pt]
 			for _, pl := range []int{0, 5, 50} {
 				got, err := FiltFilt(b, a, x, &FiltFiltOptions{PadType: pt, PadLen: pl})
 				mustOK(t, err)

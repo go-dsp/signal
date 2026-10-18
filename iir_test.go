@@ -210,7 +210,8 @@ func TestOrderSelectionOracle(t *testing.T) {
 	fn := map[string]func(wp, ws []float64, gp, gs float64, analog bool, fs float64) (int, []float64, error){
 		"buttord": ButtOrd, "cheb1ord": Cheb1Ord, "cheb2ord": Cheb2Ord, "ellipord": EllipOrd,
 	}
-	for name, f := range fn {
+	for _, name := range sortedKeys(fn) {
+		f := fn[name]
 		for si, s := range specs {
 			for _, mode := range []string{"digital", "analog", "fs"} {
 				wp, ws := append([]float64(nil), s.wp...), append([]float64(nil), s.ws...)

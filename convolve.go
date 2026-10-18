@@ -61,6 +61,16 @@ func convolveDirect(x, h []float64) []float64 {
 		x, h = h, x
 	}
 	out := make([]float64, len(x)+len(h)-1)
+	if len(h) >= simdDotMin {
+		// one SIMD dot product per output sample over the zero-padded signal
+		hr := reversed(h)
+		xp := make([]float64, len(x)+2*(len(h)-1))
+		copy(xp[len(h)-1:], x)
+		for n := range out {
+			out[n] = dot(hr, xp[n:n+len(h)])
+		}
+		return out
+	}
 	for j, hv := range h {
 		if hv == 0 {
 			continue

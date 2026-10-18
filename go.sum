@@ -2,3 +2,7 @@ github.com/go-fft/fft v0.27.1 h1:JrkfueLondme8Dx7M1V9azApWYe4ypZnWTmGLkhECqY=
 github.com/go-fft/fft v0.27.1/go.mod h1:GN5V4TWCjV05ECqH1ONfjFM6Z1m2shqCdssxKGqQ41s=
 github.com/go-numerics/special v0.1.0 h1:HcsebTwcNuAhFBP8RuOirO9XVmWJSrxARiOVkyeCfUk=
 github.com/go-numerics/special v0.1.0/go.mod h1:T0QKLvh32lH5Bq9wiTEvtlaFd1vaOKRGrOPgvTeYfdM=
+github.com/go-simd/floats v0.3.1 h1:FxME95S2qMD2fVjrrSbApy3lvKmZ1mUuWDPOXzGKoi0=
+github.com/go-simd/floats v0.3.1/go.mod h1:3JH9InSCB1H1lhpaa2qG5smJGxn23Dmdt1tSie+5IQQ=
+golang.org/x/sys v0.48.0 h1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=
+golang.org/x/sys v0.48.0/go.mod h1:hNLxWAXmnKAxqDtdwIYC4bM9oQPEecfsnNMuSxOs3og=

@@ -19,10 +19,8 @@ import (
 	"bufio"
 	"bytes"
 	"compress/gzip"
-	"crypto/sha256"
 	"encoding/base64"
 	"encoding/binary"
-	"encoding/hex"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -91,10 +89,11 @@ type oracleProc struct {
 }
 
 var (
-	procMu sync.Mutex
-	proc   *oracleProc
-	stores = map[string]map[string]string{} // test -> request key -> response line
-	loaded = map[string]map[string]string{}
+	procMu   sync.Mutex
+	proc     *oracleProc
+	stores   = map[string]map[string]string{} // test -> "call number function" -> response line
+	seqCount = map[string]int{}
+	loaded   = map[string]map[string]string{}
 )
 
 func startOracle() (*oracleProc, error) {
@@ -384,12 +383,21 @@ func oracleCall(t testing.TB, fn string, args []any, kw KW, bench, rounds int) (
 	if err != nil {
 		t.Fatal(err)
 	}
-	sum := sha256.Sum256(line)
-	key := hex.EncodeToString(sum[:])
 	test := strings.SplitN(t.Name(), "/", 2)[0]
 	var resp string
 	procMu.Lock()
 	defer procMu.Unlock()
+	// Fixtures are keyed by the position of the call within its test, not by
+	// the bits of its arguments: test inputs are computed with math functions
+	// and fused multiply-adds that round differently on different
+	// architectures, but the sequence of oracle calls does not.
+	if _, ok := seqCount[test]; !ok {
+		t.Cleanup(func() { procMu.Lock(); delete(seqCount, test); procMu.Unlock() })
+	}
+	key := fmt.Sprintf("%05d %s", seqCount[test], fn)
+	if bench == 0 {
+		seqCount[test]++
+	}
 	if *update || bench > 0 {
 		if proc == nil {
 			if proc, err = startOracle(); err != nil {
@@ -408,7 +416,7 @@ func oracleCall(t testing.TB, fn string, args []any, kw KW, bench, rounds int) (
 	} else {
 		var ok bool
 		if resp, ok = loadStore(test)[key]; !ok {
-			t.Fatalf("no fixture for %s %.80s...; run: GOWORK=off go test -update -run %s", fn, line, test)
+			t.Fatalf("no fixture %q; run: GOWORK=off go test -update -run %s", key, test)
 		}
 	}
 	var r map[string]any

@@ -142,7 +142,7 @@ func TestResampleOracle(t *testing.T) {
 	for i, f := range []func() error{
 		func() error { _, e := Resample(nil, 4, nil); return e },
 		func() error { _, e := Resample(x, 0, nil); return e },
-		func() error { _, e := Resample(x, 1<<40, nil); return e },
+		func() error { _, e := Resample(x, 1<<30, nil); return e },
 		func() error { _, e := Resample(x, 8, &ResampleOptions{WindowFreq: []float64{1}}); return e },
 		func() error {
 			_, e := Resample(x, 8, &ResampleOptions{Window: func(int, bool) []float64 { return nil }})
@@ -200,7 +200,7 @@ func TestHilbertOracle(t *testing.T) {
 	mustErr(t, "negative N", err)
 	_, err = Hilbert(nil, 0)
 	mustErr(t, "empty", err)
-	_, err = Hilbert([]float64{1}, 1<<40)
+	_, err = Hilbert([]float64{1}, 1<<30)
 	mustErr(t, "huge N", err)
 }
 

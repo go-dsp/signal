@@ -8,6 +8,7 @@ import (
 	"sort"
 
 	"github.com/go-fft/fft"
+	"github.com/go-simd/floats"
 )
 
 // PadMode is the signal extension used by Upfirdn and ResamplePoly beyond the
@@ -101,8 +102,15 @@ func validPadMode(m PadMode) bool {
 	return false
 }
 
+// simdDotMin is the vector length from which the assembly dot kernel of
+// go-simd/floats beats the scalar loop (see docs/perf.md).
+const simdDotMin = 24
+
 // dot is the inner product of equal-length vectors.
 func dot(a, b []float64) float64 {
+	if len(a) >= simdDotMin {
+		return floats.Dot(a, b)
+	}
 	var s0, s1, s2, s3 float64
 	i := 0
 	for ; i+4 <= len(a); i += 4 {
@@ -117,9 +125,13 @@ func dot(a, b []float64) float64 {
 	return (s0 + s1) + (s2 + s3)
 }
 
-func upfirdnLen(lh, nx, up, down int) int {
-	return ((nx-1)*up+lh-1)/down + 1
+// upfirdnLen64 is the output length of Upfirdn, in 64-bit arithmetic so that
+// absurd arguments are rejected instead of overflowing a 32-bit int.
+func upfirdnLen64(lh, nx, up, down int) int64 {
+	return (int64(nx-1)*int64(up)+int64(lh)-1)/int64(down) + 1
 }
+
+func upfirdnLen(lh, nx, up, down int) int { return int(upfirdnLen64(lh, nx, up, down)) }
 
 // maxAlloc bounds the size of any single output a constructor or filter will
 // allocate (in elements), so that absurd arguments fail instead of exhausting
@@ -145,10 +157,10 @@ func Upfirdn(h, x []float64, up, down int, mode PadMode, cval float64) ([]float6
 	if len(x) == 0 {
 		return []float64{}, nil
 	}
-	nout := upfirdnLen(len(h), len(x), up, down)
-	if nout > maxAlloc || len(h) > maxAlloc {
+	if upfirdnLen64(len(h), len(x), up, down) > maxAlloc || up > 1<<20 {
 		return nil, errors.New("signal: output too large")
 	}
+	nout := upfirdnLen(len(h), len(x), up, down)
 	// polyphase subfilters, each reversed for a forward dot product
 	hrev := make([][]float64, up)
 	for r := 0; r < up && r < len(h); r++ {

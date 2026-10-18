@@ -162,7 +162,8 @@ func TestSpectrogramOracle(t *testing.T) {
 	rng := newRNG(83)
 	x := testSignal(rng, 1000)
 	modes := map[SpectrogramMode]string{SpecPSD: "psd", SpecMagnitude: "magnitude", SpecAngle: "angle", SpecPhase: "phase"}
-	for mode, name := range modes {
+	for _, mode := range sortedKeys(modes) {
+		name := modes[mode]
 		for _, c := range []struct {
 			o  SpectralOptions
 			kw KW

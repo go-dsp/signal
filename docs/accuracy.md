@@ -8,5 +8,6 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 
 | group | values | exact | max ULP | norm err |
 |---|---:|---:|---:|---:|
-| decimate | 2784 | 300 (10.8%) | 561152 | 2.64e-14 |
-| upfirdn sparse | 8 | 8 (100.0%) | 0 | 0.00e+00 |
+| convert/cplxpair | 220 | 220 (100.0%) | 0 | 0.00e+00 |
+| convert/cplxreal complex | 86 | 86 (100.0%) | 0 | 0.00e+00 |
+| convert/cplxreal real | 24 | 24 (100.0%) | 0 | 0.00e+00 |
