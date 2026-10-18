@@ -123,3 +123,5 @@ func mustOK(t *testing.T, err error) {
 type bigInt = big.Int
 
 func bigOne() *big.Int { return big.NewInt(1) }
+
+func expf(x float64) float64 { return math.Exp(x) }

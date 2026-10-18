@@ -8,6 +8,14 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 
 | group | values | exact | max ULP | norm err |
 |---|---:|---:|---:|---:|
-| firwin | 364 | 51 (14.0%) | 9192151159073704 | 6.37e-16 |
-| firwin window | 165 | 23 (13.9%) | 60 | 2.79e-16 |
-| firwin2 | 252 | 21 (8.3%) | 22626913285500576 | 2.24e-16 |
+| convolve auto | 10479 | 1514 (14.4%) | 44092 | 2.52e-15 |
+| convolve direct | 10479 | 1750 (16.7%) | 44092 | 2.52e-15 |
+| convolve fft | 10479 | 820 (7.8%) | 58622 | 1.57e-15 |
+| correlate auto | 10479 | 1611 (15.4%) | 546622 | 1.79e-15 |
+| correlate direct | 10479 | 1933 (18.4%) | 546622 | 1.79e-15 |
+| correlate fft | 10479 | 795 (7.6%) | 549978 | 8.40e-16 |
+| deconvolve quot | 39 | 39 (100.0%) | 0 | 0.00e+00 |
+| deconvolve rem | 48 | 44 (91.7%) | 8709680204357828608 | 1.34e-16 |
+| fftconvolve | 10479 | 820 (7.8%) | 58622 | 1.57e-15 |
+| oaconvolve | 10479 | 863 (8.2%) | 58622 | 1.57e-15 |
+| oaconvolve long | 100598 | 4786 (4.8%) | 427609 | 1.02e-15 |
