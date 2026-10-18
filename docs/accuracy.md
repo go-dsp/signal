@@ -8,4 +8,6 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 
 | group | values | exact | max ULP | norm err |
 |---|---:|---:|---:|---:|
-| window exponential center | 9 | 9 (100.0%) | 0 | 0.00e+00 |
+| firwin | 364 | 51 (14.0%) | 9192151159073704 | 6.37e-16 |
+| firwin window | 165 | 23 (13.9%) | 60 | 2.79e-16 |
+| firwin2 | 252 | 21 (8.3%) | 22626913285500576 | 2.24e-16 |
