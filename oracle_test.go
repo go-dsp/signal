@@ -99,6 +99,8 @@ var (
 func startOracle() (*oracleProc, error) {
 	cmd := exec.Command("uv", "run", "--with", "scipy==1.18.1", "--with", "numpy==2.5.4", "python", "-c", oraclePy)
 	cmd.Stderr = os.Stderr
+	// one core for the oracle too (the performance table compares on one core)
+	cmd.Env = append(os.Environ(), "OMP_NUM_THREADS=1", "OPENBLAS_NUM_THREADS=1", "MKL_NUM_THREADS=1", "VECLIB_MAXIMUM_THREADS=1")
 	in, err := cmd.StdinPipe()
 	if err != nil {
 		return nil, err

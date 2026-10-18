@@ -8,6 +8,229 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 
 | group | values | exact | max ULP | norm err |
 |---|---:|---:|---:|---:|
+| bessel | 6 | 4 (66.7%) | 2 | 1.41e-16 |
+| besselap delay k | 26 | 26 (100.0%) | 0 | 0.00e+00 |
+| besselap mag k | 26 | 1 (3.8%) | 707 | 1.14e-13 |
+| besselap phase k | 26 | 26 (100.0%) | 0 | 0.00e+00 |
+| bilinear a | 81 | 81 (100.0%) | 0 | 0.00e+00 |
+| bilinear b | 81 | 67 (82.7%) | 25 | 2.36e-16 |
+| bilinear_zpk k | 9 | 5 (55.6%) | 3 | 5.32e-16 |
+| bilinear_zpk p | 90 | 65 (72.2%) | 1 | 1.23e-16 |
+| bilinear_zpk z | 90 | 79 (87.8%) | 1 | 2.22e-16 |
+| buttap k | 41 | 41 (100.0%) | 0 | 0.00e+00 |
+| butter fs | 8 | 4 (50.0%) | 4 | 3.99e-16 |
+| buttord wn | 63 | 40 (63.5%) | 2124967879 | 3.44e-07 |
+| cheb1ap k | 164 | 28 (17.1%) | 68 | 8.86e-15 |
+| cheb1ord wn | 63 | 49 (77.8%) | 1347072943 | 2.14e-07 |
+| cheb2ap k | 164 | 33 (20.1%) | 55 | 7.52e-15 |
+| cheb2ord wn | 63 | 20 (31.7%) | 1323746378 | 2.43e-07 |
+| cheby1 | 6 | 1 (16.7%) | 63 | 1.70e-16 |
+| cheby2 | 6 | 5 (83.3%) | 1 | 1.37e-16 |
+| coherence | 1559 | 275 (17.6%) | 245 | 2.72e-14 |
+| coherence f | 1559 | 1559 (100.0%) | 0 | 0.00e+00 |
 | convert/cplxpair | 220 | 220 (100.0%) | 0 | 0.00e+00 |
 | convert/cplxreal complex | 86 | 86 (100.0%) | 0 | 0.00e+00 |
 | convert/cplxreal real | 24 | 24 (100.0%) | 0 | 0.00e+00 |
+| convert/normalize | 18 | 18 (100.0%) | 0 | 0.00e+00 |
+| convert/sos2tf den | 70 | 63 (90.0%) | 2 | 1.02e-16 |
+| convert/sos2tf num | 70 | 70 (100.0%) | 0 | 0.00e+00 |
+| convert/tf2sos | 180 | 78 (43.3%) | 2484 | 1.59e-14 |
+| convert/zpk2sos | 7182 | 6934 (96.5%) | 2 | 2.69e-16 |
+| convert/zpk2tf den | 514 | 147 (28.6%) | 5424 | 3.25e-15 |
+| convert/zpk2tf num | 496 | 162 (32.7%) | 11006841 | 2.74e-15 |
+| convolve auto | 10479 | 2608 (24.9%) | 11484 | 8.83e-16 |
+| convolve direct | 10479 | 2616 (25.0%) | 11417 | 8.83e-16 |
+| convolve fft | 10479 | 820 (7.8%) | 58622 | 1.57e-15 |
+| correlate auto | 10479 | 2538 (24.2%) | 589824 | 1.80e-15 |
+| correlate direct | 10479 | 2611 (24.9%) | 589824 | 1.80e-15 |
+| correlate fft | 10479 | 795 (7.6%) | 549978 | 8.40e-16 |
+| csd f | 1688 | 1688 (100.0%) | 0 | 0.00e+00 |
+| csd p | 3376 | 90 (2.7%) | 182263 | 5.95e-16 |
+| csd uneven | 130 | 5 (3.8%) | 2268 | 4.21e-16 |
+| csd uneven f | 65 | 65 (100.0%) | 0 | 0.00e+00 |
+| decimate | 2784 | 317 (11.4%) | 561152 | 2.64e-14 |
+| deconvolve quot | 39 | 39 (100.0%) | 0 | 0.00e+00 |
+| deconvolve rem | 48 | 44 (91.7%) | 8709680204357828608 | 1.34e-16 |
+| detrend | 600 | 90 (15.0%) | 256 | 4.02e-16 |
+| dpss ratios | 77 | 9 (11.7%) | 8721734050048620544 | 4.22e-15 |
+| dpss window | 16950 | 156 (0.9%) | 8818027132053350400 | 1.54e-13 |
+| ellip | 12 | 8 (66.7%) | 2 | 1.27e-16 |
+| ellipap k | 68 | 6 (8.8%) | 121218808 | 1.68e-08 |
+| ellipj cn | 403 | 302 (74.9%) | 4 | 2.22e-16 |
+| ellipj dn | 403 | 288 (71.5%) | 56 | 2.33e-15 |
+| ellipj sn | 403 | 346 (85.9%) | 1 | 1.11e-16 |
+| ellipord wn | 63 | 49 (77.8%) | 1243567211 | 1.97e-07 |
+| fftconvolve | 10479 | 820 (7.8%) | 58622 | 1.57e-15 |
+| filtfilt | 7200 | 1620 (22.5%) | 15034 | 6.84e-15 |
+| filtfilt fir | 40 | 40 (100.0%) | 0 | 0.00e+00 |
+| filtfilt gust | 1200 | 349 (29.1%) | 5171 | 4.73e-15 |
+| filtfilt gust gain | 3 | 3 (100.0%) | 0 | 0.00e+00 |
+| find_peaks left_ips | 43 | 43 (100.0%) | 0 | 0.00e+00 |
+| find_peaks left_thresholds | 27 | 27 (100.0%) | 0 | 0.00e+00 |
+| find_peaks peak_heights | 62 | 62 (100.0%) | 0 | 0.00e+00 |
+| find_peaks prominences | 86 | 86 (100.0%) | 0 | 0.00e+00 |
+| find_peaks right_ips | 43 | 43 (100.0%) | 0 | 0.00e+00 |
+| find_peaks right_thresholds | 27 | 27 (100.0%) | 0 | 0.00e+00 |
+| find_peaks width_heights | 43 | 43 (100.0%) | 0 | 0.00e+00 |
+| find_peaks widths | 43 | 43 (100.0%) | 0 | 0.00e+00 |
+| firls | 109 | 4 (3.7%) | 1385 | 1.35e-15 |
+| firwin | 364 | 51 (14.0%) | 9192151159073704 | 6.37e-16 |
+| firwin window | 165 | 23 (13.9%) | 60 | 2.79e-16 |
+| firwin2 | 252 | 21 (8.3%) | 22626913285500576 | 2.24e-16 |
+| freqs h | 3642 | 1698 (46.6%) | 800 | 3.50e-15 |
+| freqs w | 1821 | 686 (37.7%) | 9 | 9.09e-16 |
+| freqs_zpk h | 462 | 138 (29.9%) | 388 | 3.00e-15 |
+| freqs_zpk w | 210 | 134 (63.8%) | 5 | 1.42e-16 |
+| freqz h | 3990 | 1616 (40.5%) | 8741486876726132736 | 1.04e-15 |
+| freqz w | 1995 | 1995 (100.0%) | 0 | 0.00e+00 |
+| freqz_zpk h | 830 | 274 (33.0%) | 14592311762670126 | 1.23e-15 |
+| freqz_zpk w | 415 | 415 (100.0%) | 0 | 0.00e+00 |
+| group_delay gd | 1026 | 282 (27.5%) | 1024 | 3.56e-15 |
+| group_delay singular | 3 | 1 (33.3%) | 7 | 8.17e-16 |
+| group_delay w | 1029 | 1029 (100.0%) | 0 | 0.00e+00 |
+| harness/cumsum | 5 | 5 (100.0%) | 0 | 0.00e+00 |
+| hilbert | 950 | 172 (18.1%) | 8739644495060389888 | 1.21e-15 |
+| iirdesign analog | 16 | 12 (75.0%) | 1 | 1.33e-16 |
+| iirdesign fs | 12 | 2 (16.7%) | 2 | 1.38e-16 |
+| iirdesign k | 16 | 0 (0.0%) | 2664265013 | 3.79e-07 |
+| iirdesign poles | 354 | 107 (30.2%) | 2564931370 | 9.30e-08 |
+| iirdesign zeros | 354 | 192 (54.2%) | 1607276521 | 4.53e-08 |
+| iirfilter a | 900 | 371 (41.2%) | 768 | 7.14e-15 |
+| iirfilter b | 810 | 421 (52.0%) | 24 | 2.64e-15 |
+| iirfilter gain | 464 | 134 (28.9%) | 1091 | 1.32e-13 |
+| iirfilter high ba den | 1032 | 76 (7.4%) | 37545157 | 9.63e-12 |
+| iirfilter high ba num | 1032 | 227 (22.0%) | 339056478 | 1.17e-08 |
+| iirfilter high poles | 2016 | 788 (39.1%) | 583 | 4.51e-16 |
+| iirfilter high sos | 3024 | 2078 (68.7%) | 1538 | 4.44e-16 |
+| iirfilter high zeros | 2016 | 1694 (84.0%) | 1538 | 8.75e-16 |
+| iirfilter poles | 8808 | 3947 (44.8%) | 2794 | 3.62e-14 |
+| iirfilter sos | 8586 | 6220 (72.4%) | 207 | 2.26e-15 |
+| iirfilter zeros | 7828 | 6362 (81.3%) | 9748 | 2.74e-14 |
+| iirnotch a | 9 | 7 (77.8%) | 11 | 1.92e-16 |
+| iirnotch b | 9 | 7 (77.8%) | 11 | 1.92e-16 |
+| iirpeak a | 9 | 7 (77.8%) | 11 | 1.92e-16 |
+| iirpeak b | 9 | 9 (100.0%) | 0 | 0.00e+00 |
+| istft | 8137 | 2411 (29.6%) | 8759921253504906240 | 9.84e-15 |
+| istft nfft | 1024 | 213 (20.8%) | 4651 | 6.93e-16 |
+| istft roundtrip | 1000 | 293 (29.3%) | 28 | 4.73e-16 |
+| kaiser_atten | 21 | 15 (71.4%) | 1 | 1.77e-16 |
+| kaiserord beta | 21 | 18 (85.7%) | 1 | 1.96e-16 |
+| lfilter | 5540 | 3731 (67.3%) | 144748 | 3.51e-15 |
+| lfilter coefficients | 200 | 195 (97.5%) | 4 | 2.59e-16 |
+| lfilter zf | 85 | 77 (90.6%) | 10 | 2.72e-16 |
+| lfilter zi | 5690 | 4076 (71.6%) | 105708 | 4.87e-16 |
+| lfilter_zi | 15 | 12 (80.0%) | 1 | 1.19e-16 |
+| lfiltic | 15 | 7 (46.7%) | 6 | 2.67e-16 |
+| lfiltic no x | 13 | 13 (100.0%) | 0 | 0.00e+00 |
+| lombscargle | 320 | 6 (1.9%) | 1184 | 1.57e-15 |
+| lombscargle amplitude | 160 | 2 (1.2%) | 1570 | 3.63e-14 |
+| lp2bp a | 141 | 83 (58.9%) | 3 | 3.76e-16 |
+| lp2bp b | 125 | 64 (51.2%) | 3 | 5.34e-16 |
+| lp2bp_zpk k | 9 | 9 (100.0%) | 0 | 0.00e+00 |
+| lp2bp_zpk p | 180 | 166 (92.2%) | 2 | 1.51e-16 |
+| lp2bp_zpk z | 156 | 156 (100.0%) | 0 | 0.00e+00 |
+| lp2bs a | 141 | 125 (88.7%) | 2 | 3.98e-16 |
+| lp2bs b | 141 | 131 (92.9%) | 1 | 1.46e-16 |
+| lp2bs_zpk k | 9 | 8 (88.9%) | 1 | 2.00e-16 |
+| lp2bs_zpk p | 180 | 132 (73.3%) | 2 | 2.92e-16 |
+| lp2bs_zpk z | 180 | 154 (85.6%) | 2 | 1.60e-16 |
+| lp2hp a | 158 | 152 (96.2%) | 1 | 1.93e-16 |
+| lp2hp b | 158 | 155 (98.1%) | 1 | 1.76e-16 |
+| lp2hp_zpk k | 9 | 8 (88.9%) | 1 | 2.00e-16 |
+| lp2hp_zpk p | 90 | 64 (71.1%) | 1 | 1.59e-16 |
+| lp2hp_zpk z | 90 | 72 (80.0%) | 1 | 1.51e-16 |
+| lp2lp a | 79 | 54 (68.4%) | 3 | 2.91e-16 |
+| lp2lp b | 63 | 39 (61.9%) | 2 | 2.23e-16 |
+| lp2lp_zpk k | 9 | 9 (100.0%) | 0 | 0.00e+00 |
+| lp2lp_zpk p | 90 | 90 (100.0%) | 0 | 0.00e+00 |
+| lp2lp_zpk z | 66 | 66 (100.0%) | 0 | 0.00e+00 |
+| oaconvolve | 10479 | 863 (8.2%) | 58622 | 1.57e-15 |
+| oaconvolve long | 100598 | 4786 (4.8%) | 427609 | 1.02e-15 |
+| peak_prominences | 105 | 105 (100.0%) | 0 | 0.00e+00 |
+| peak_widths | 105 | 105 (100.0%) | 0 | 0.00e+00 |
+| peak_widths heights | 105 | 105 (100.0%) | 0 | 0.00e+00 |
+| peak_widths left | 105 | 105 (100.0%) | 0 | 0.00e+00 |
+| peak_widths right | 105 | 105 (100.0%) | 0 | 0.00e+00 |
+| periodogram | 1063 | 42 (4.0%) | 32972154693746688 | 9.37e-16 |
+| periodogram f | 1063 | 1063 (100.0%) | 0 | 0.00e+00 |
+| remez | 300 | 5 (1.7%) | 14111189 | 4.80e-14 |
+| resample | 1672 | 252 (15.1%) | 5152 | 7.78e-16 |
+| resample window | 353 | 58 (16.4%) | 416 | 5.91e-16 |
+| resample window array | 472 | 140 (29.7%) | 1474 | 4.56e-16 |
+| resample_poly | 2098 | 665 (31.7%) | 755 | 6.26e-16 |
+| resample_poly constant | 300 | 107 (35.7%) | 34 | 2.59e-16 |
+| resample_poly cval | 400 | 62 (15.5%) | 104 | 5.26e-16 |
+| resample_poly edge | 300 | 104 (34.7%) | 34 | 2.61e-16 |
+| resample_poly hann | 334 | 79 (23.7%) | 43 | 2.61e-16 |
+| resample_poly line | 300 | 106 (35.3%) | 34 | 2.61e-16 |
+| resample_poly maximum | 300 | 150 (50.0%) | 2048 | 5.26e-16 |
+| resample_poly mean | 300 | 176 (58.7%) | 64 | 2.60e-16 |
+| resample_poly median | 300 | 182 (60.7%) | 16384 | 2.60e-16 |
+| resample_poly minimum | 300 | 115 (38.3%) | 128 | 5.14e-16 |
+| resample_poly reflect | 300 | 105 (35.0%) | 34 | 2.61e-16 |
+| resample_poly taps | 400 | 400 (100.0%) | 0 | 0.00e+00 |
+| sosfilt | 2500 | 691 (27.6%) | 9536 | 1.86e-15 |
+| sosfilt zf | 36 | 6 (16.7%) | 253 | 2.40e-14 |
+| sosfilt zi | 2500 | 661 (26.4%) | 7616 | 7.90e-16 |
+| sosfilt_zi | 36 | 33 (91.7%) | 1 | 1.19e-16 |
+| sosfiltfilt | 10000 | 1884 (18.8%) | 50112 | 2.91e-15 |
+| sosfiltfilt padlen | 50 | 13 (26.0%) | 30 | 2.19e-16 |
+| sosfiltfilt short | 50 | 50 (100.0%) | 0 | 0.00e+00 |
+| sosfreqz h | 500 | 150 (30.0%) | 223 | 8.21e-16 |
+| sosfreqz w | 250 | 250 (100.0%) | 0 | 0.00e+00 |
+| spectrogram f | 1164 | 1164 (100.0%) | 0 | 0.00e+00 |
+| spectrogram magnitude | 4245 | 467 (11.0%) | 33485 | 1.40e-14 |
+| spectrogram psd | 4245 | 206 (4.9%) | 62385 | 2.53e-15 |
+| spectrogram t | 280 | 280 (100.0%) | 0 | 0.00e+00 |
+| stft | 21356 | 2211 (10.4%) | 8714465278961909760 | 2.74e-15 |
+| stft f | 408 | 408 (100.0%) | 0 | 0.00e+00 |
+| stft t | 245 | 245 (100.0%) | 0 | 0.00e+00 |
+| unwrap | 11 | 11 (100.0%) | 0 | 0.00e+00 |
+| upfirdn antireflect | 333 | 163 (48.9%) | 75 | 3.09e-16 |
+| upfirdn antisymmetric | 333 | 159 (47.7%) | 406 | 3.13e-16 |
+| upfirdn constant | 333 | 166 (49.8%) | 1054 | 2.22e-16 |
+| upfirdn edge | 333 | 169 (50.8%) | 55 | 1.98e-16 |
+| upfirdn far antireflect | 22 | 22 (100.0%) | 0 | 0.00e+00 |
+| upfirdn far antisymmetric | 42 | 42 (100.0%) | 0 | 0.00e+00 |
+| upfirdn far constant | 42 | 42 (100.0%) | 0 | 0.00e+00 |
+| upfirdn far edge | 42 | 42 (100.0%) | 0 | 0.00e+00 |
+| upfirdn far line | 22 | 22 (100.0%) | 0 | 0.00e+00 |
+| upfirdn far reflect | 22 | 22 (100.0%) | 0 | 0.00e+00 |
+| upfirdn far smooth | 22 | 22 (100.0%) | 0 | 0.00e+00 |
+| upfirdn far symmetric | 42 | 42 (100.0%) | 0 | 0.00e+00 |
+| upfirdn far wrap | 42 | 42 (100.0%) | 0 | 0.00e+00 |
+| upfirdn line | 333 | 163 (48.9%) | 126 | 2.54e-16 |
+| upfirdn reflect | 333 | 159 (47.7%) | 55 | 3.13e-16 |
+| upfirdn smooth | 333 | 160 (48.0%) | 92 | 3.25e-16 |
+| upfirdn sparse | 8 | 8 (100.0%) | 0 | 0.00e+00 |
+| upfirdn symmetric | 333 | 162 (48.6%) | 973 | 3.10e-16 |
+| upfirdn wrap | 333 | 170 (51.1%) | 55 | 3.13e-16 |
+| welch f | 1688 | 1688 (100.0%) | 0 | 0.00e+00 |
+| welch p | 1688 | 55 (3.3%) | 74943 | 1.14e-15 |
+| welch taps | 26 | 8 (30.8%) | 53 | 2.59e-16 |
+| welch taps f | 26 | 26 (100.0%) | 0 | 0.00e+00 |
+| window barthann | 744 | 449 (60.3%) | 49 | 2.23e-16 |
+| window bartlett | 744 | 581 (78.1%) | 16 | 1.67e-16 |
+| window blackman | 744 | 199 (26.7%) | 1844 | 6.11e-16 |
+| window blackmanharris | 744 | 179 (24.1%) | 4251 | 7.78e-16 |
+| window bohman | 744 | 317 (42.6%) | 8744 | 3.33e-16 |
+| window boxcar | 744 | 744 (100.0%) | 0 | 0.00e+00 |
+| window chebwin | 1488 | 238 (16.0%) | 73523 | 2.61e-13 |
+| window cosine | 744 | 597 (80.2%) | 1 | 1.13e-16 |
+| window dpss | 714 | 39 (5.5%) | 357 | 5.55e-15 |
+| window exponential | 744 | 682 (91.7%) | 1 | 1.31e-16 |
+| window exponential center | 9 | 9 (100.0%) | 0 | 0.00e+00 |
+| window flattop | 744 | 180 (24.2%) | 1133 | 4.44e-16 |
+| window gaussian | 744 | 688 (92.5%) | 1 | 1.11e-16 |
+| window general_cosine | 15 | 13 (86.7%) | 6 | 4.16e-17 |
+| window general_gaussian | 744 | 555 (74.6%) | 428 | 1.11e-16 |
+| window general_hamming | 744 | 477 (64.1%) | 4 | 2.22e-16 |
+| window hamming | 744 | 217 (29.2%) | 15 | 6.94e-16 |
+| window hann | 744 | 324 (43.5%) | 512 | 5.57e-16 |
+| window hann_periodic | 8 | 4 (50.0%) | 2 | 1.11e-16 |
+| window hann_symmetric | 8 | 5 (62.5%) | 2 | 1.17e-16 |
+| window kaiser | 1488 | 835 (56.1%) | 14 | 1.40e-15 |
+| window nuttall | 744 | 268 (36.0%) | 488 | 4.45e-16 |
+| window parzen | 744 | 636 (85.5%) | 4 | 2.22e-16 |
+| window triang | 744 | 744 (100.0%) | 0 | 0.00e+00 |
+| window tukey | 2976 | 2490 (83.7%) | 512 | 5.57e-16 |
