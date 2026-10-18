@@ -82,7 +82,7 @@ in `testdata/oracle` and replayed from there, so `go test` needs no Python and
 the same recorded SciPy output is checked on every architecture CI runs.
 `GOWORK=off go test -update ./...` re-records it and rewrites
 [docs/accuracy.md](docs/accuracy.md), the table of maximum ULP errors,
-normwise relative errors and exact-equality counts for 250 groups of values;
+normwise relative errors and exact-equality counts for 225 groups of values;
 [docs/verification.md](docs/verification.md) explains the measures and the few
 places where SciPy itself is the less accurate side (ill-conditioned elliptic
 and Bessel designs, high-order transfer functions).

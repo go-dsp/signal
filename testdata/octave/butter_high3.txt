@@ -1,0 +1,8 @@
+0x1.0714e224c6fdbp-02
+-0x1.8a9f53372a7c8p-01
+0x1.8a9f53372a7c8p-01
+-0x1.0714e224c6fdbp-02
+0x1p+00
+-0x1.278c11eff019bp-01
+0x1.afe8f1affdfacp-02
+-0x1.cd2fdcb2cdf61p-05
