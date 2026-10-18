@@ -41,8 +41,8 @@ var update = flag.Bool("update", false, "call the SciPy oracle and rewrite testd
 
 const oraclePy = `
 import sys,json,base64,time
-import numpy as np, scipy, scipy.signal, scipy.special, scipy.fft
-ns={'signal':scipy.signal,'special':scipy.special,'fft':scipy.fft,'np':np,'windows':scipy.signal.windows}
+import numpy as np, scipy, scipy.signal, scipy.special, scipy.fft, scipy.linalg, scipy.optimize
+ns={'signal':scipy.signal,'special':scipy.special,'fft':scipy.fft,'np':np,'windows':scipy.signal.windows,'linalg':scipy.linalg,'optimize':scipy.optimize}
 def b64(a,dt): return base64.b64encode(np.ascontiguousarray(a,dtype=dt).tobytes()).decode()
 def dec(x):
     if isinstance(x,dict):

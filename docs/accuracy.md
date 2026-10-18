@@ -8,7 +8,4 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 
 | group | values | exact | max ULP | norm err |
 |---|---:|---:|---:|---:|
-| iirnotch a | 9 | 7 (77.8%) | 11 | 1.92e-16 |
-| iirnotch b | 9 | 7 (77.8%) | 11 | 1.92e-16 |
-| iirpeak a | 9 | 7 (77.8%) | 11 | 1.92e-16 |
-| iirpeak b | 9 | 9 (100.0%) | 0 | 0.00e+00 |
+| window exponential center | 9 | 9 (100.0%) | 0 | 0.00e+00 |
