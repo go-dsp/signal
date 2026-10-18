@@ -48,11 +48,37 @@ real number with an imaginary part of `-0.0` is `-i*s`, not `+i*s`) the Go code
 reproduces the sign of the zero so that the conjugate pairs come out in the
 same order.
 
+## Octave and MATLAB semantics
+
+Octave 9.2 with its `signal` package (GPL: used as an oracle only, run and never
+read or ported) checks that the MATLAB names mean what the README says
+(`octave_test.go`, responses in `testdata/octave`, replayed like the SciPy ones).
+One-time setup of the image, with Docker:
+
+```
+docker run --platform linux/amd64 --name octsig gnuoctave/octave:9.2.0 \
+    octave-cli --eval "pkg install -forge control signal"
+docker commit octsig go-dsp-octave-signal:9.2
+GOWORK=off go test -run TestOctave -octave -count=1 .
+```
+
+Normwise differences from Octave (Go versus Octave): `butter` (low, high, band,
+stop), `cheby1`, `cheby2` 2e-16 to 9e-16; `buttord`, `cheb1ord`, `ellipord`,
+`kaiserord`, `findpeaks` exact; `firls` 2e-15; `remez` 5e-16 (the same
+optimum); `filter`, `conv`, `freqz`, `hilbert`, `detrend`, `hamming`,
+`blackman`, `kaiser` 1e-16 to 1e-15; `chebwin` 2.5e-15. Three functions differ
+by more than rounding, and the difference is Octave's, not a semantic one:
+`ellip` (1e-5; Octave's design is less exact, SciPy's and this package's agree),
+and `fir1`/`fir2` (3e-4 to 5e-3 from the window method of SciPy, which this
+package follows). Octave's `resample`, `pwelch` and `periodogram` use other
+conventions (different anti-aliasing filter, one-sided scaling) and are not
+compared.
+
 ## Where the numbers are not 1e-16
 
 | group | norm err | why |
 |---|---:|---|
-| elliptic prototypes (`ellipap k`) | 1.7e-8 | Pole positions are ill-conditioned in the stopband attenuation and the order. The tests compare up to order 16. At order 18-30 SciPy itself misses the requested passband ripple by 1e-7 to 6e-3 (checked by evaluating `|H(j)|^2` of both implementations), and so does this package, differently. |
+| elliptic prototypes (`ellipap k`) | 1.7e-8 | Pole positions are ill-conditioned in the stopband attenuation and the order. The tests compare up to order 16. At order 18-30 SciPy itself misses the requested passband ripple by 1e-7 to 6e-3 (checked by evaluating the squared magnitude at the passband edge for both implementations), and so does this package, differently. |
 | order selection wn (`buttord`, `cheb1ord`, `cheb2ord`, `ellipord`) and `iirdesign` | 1e-7 | Band-stop edges come from a bounded scalar search with `xtol = 1e-5` (`fminbound`); a one-ULP difference in the objective moves the optimum by far more than 1 ULP. |
 | `besselap` norm `mag` | 1e-13 | SciPy finds the -3 dB point with a secant search that stops at 1.5e-8; this package uses the same search. |
 | `iirfilter` transfer functions at order 16-40 (`high ba num`) | 1.2e-8 | The monomial form of a high-order filter is ill-conditioned: coefficient errors of 1e-8 are in the problem, not in either implementation. Compared in `zpk` (4e-16) and `sos` (4e-16) form the two agree to rounding. This is why the package recommends SOS. |
