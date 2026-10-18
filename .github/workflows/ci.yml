@@ -39,6 +39,7 @@ jobs:
       - run: go vet ./...
       - run: go build ./...
       - name: gofmt
+        if: runner.os != 'Windows' # a CRLF checkout makes gofmt -l list every file
         shell: bash
         run: test -z "$(gofmt -l .)"
       - name: Test + 100% coverage gate

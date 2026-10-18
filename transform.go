@@ -52,6 +52,50 @@ func LP2HPZPK(s ZPK, wo float64) (ZPK, error) {
 	return ZPK{z, p, k}, nil
 }
 
+// cmulE is the complex product with every operation rounded separately, as
+// NumPy computes it: no fused multiply-add can change the sign of a zero.
+func cmulE(a, b complex128) complex128 {
+	ar, ai, br, bi := real(a), imag(a), real(b), imag(b)
+	return complex(float64(ar*br)-float64(ai*bi), float64(ar*bi)+float64(ai*br))
+}
+
+// cdivE is NumPy's complex division (Smith's algorithm, scaling by a
+// reciprocal), with the same signed zeros.
+func cdivE(a, b complex128) complex128 {
+	ar, ai, br, bi := real(a), imag(a), real(b), imag(b)
+	abr, abi := math.Abs(br), math.Abs(bi)
+	switch {
+	case abr >= abi:
+		if abr == 0 && abi == 0 {
+			return complex(ar/abr, ai/abi)
+		}
+		rat := bi / br
+		scl := 1.0 / (br + float64(bi*rat))
+		return complex((ar+float64(ai*rat))*scl, (ai-float64(ar*rat))*scl)
+	default:
+		rat := br / bi
+		scl := 1.0 / (bi + float64(br*rat))
+		return complex((float64(ar*rat)+ai)*scl, (float64(ai*rat)-ar)*scl)
+	}
+}
+
+// splitBand duplicates the points c of a lowpass (or highpass) prototype and
+// shifts them to +wo and -wo: v +- sqrt(v^2 - wo^2).
+func splitBand(c []complex128, wo float64) []complex128 {
+	out := make([]complex128, 0, 2*len(c))
+	root := func(v complex128) complex128 {
+		sq := cmulE(v, v)
+		return cmplx.Sqrt(complex(real(sq)-wo*wo, imag(sq)-0))
+	}
+	for _, v := range c {
+		out = append(out, v+root(v))
+	}
+	for _, v := range c {
+		out = append(out, v-root(v))
+	}
+	return out
+}
+
 // LP2BPZPK transforms a lowpass prototype to a bandpass filter centred on wo
 // with bandwidth bw (scipy.signal.lp2bp_zpk).
 func LP2BPZPK(s ZPK, wo, bw float64) (ZPK, error) {
@@ -64,16 +108,9 @@ func LP2BPZPK(s ZPK, wo, bw float64) (ZPK, error) {
 		// of a conjugate pair the square root puts first
 		lp := make([]complex128, len(c))
 		for i, v := range c {
-			lp[i] = v * complex(bw, 0) / 2
+			lp[i] = cdivE(cmulE(v, complex(bw, 0)), 2)
 		}
-		out := make([]complex128, 0, 2*len(c))
-		for _, v := range lp {
-			out = append(out, v+cmplx.Sqrt(v*v-complex(wo*wo, 0)))
-		}
-		for _, v := range lp {
-			out = append(out, v-cmplx.Sqrt(v*v-complex(wo*wo, 0)))
-		}
-		return out
+		return splitBand(lp, wo)
 	}
 	z := append(shift(s.Z), make([]complex128, deg)...)
 	return ZPK{z, shift(s.P), s.K * math.Pow(bw, float64(deg))}, nil
@@ -89,16 +126,9 @@ func LP2BSZPK(s ZPK, wo, bw float64) (ZPK, error) {
 	shift := func(c []complex128) []complex128 {
 		hp := make([]complex128, len(c))
 		for i, v := range c {
-			hp[i] = complex(bw/2, 0) / v
+			hp[i] = cdivE(complex(bw/2, 0), v)
 		}
-		out := make([]complex128, 0, 2*len(c))
-		for _, v := range hp {
-			out = append(out, v+cmplx.Sqrt(v*v-complex(wo*wo, 0)))
-		}
-		for _, v := range hp {
-			out = append(out, v-cmplx.Sqrt(v*v-complex(wo*wo, 0)))
-		}
-		return out
+		return splitBand(hp, wo)
 	}
 	z := shift(s.Z)
 	for i := 0; i < deg; i++ {

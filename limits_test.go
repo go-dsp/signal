@@ -183,3 +183,18 @@ func FuzzConvolve(f *testing.F) {
 		}
 	})
 }
+
+func TestComplexHelpers(t *testing.T) {
+	if g := cdivE(1, 0); !math.IsInf(real(g), 1) {
+		t.Errorf("1/0 = %v", g)
+	}
+	for _, c := range [][2]complex128{{1 + 2i, 3 - 4i}, {-2 + 0.5i, 0.1 + 7i}, {3, -2i}} {
+		got, want := cdivE(c[0], c[1]), c[0]/c[1]
+		if d := got - want; real(d)*real(d)+imag(d)*imag(d) > 1e-28 {
+			t.Errorf("%v / %v = %v, want %v", c[0], c[1], got, want)
+		}
+		if p, q := cmulE(c[0], c[1]), c[0]*c[1]; real(p-q) > 1e-14 || imag(p-q) > 1e-14 {
+			t.Errorf("%v * %v = %v, want %v", c[0], c[1], p, q)
+		}
+	}
+}

@@ -132,6 +132,19 @@ func IIRFilter(n int, wn []float64, bt BandType, ft FilterType, o *IIROptions) (
 	if err != nil {
 		return ZPK{}, err
 	}
+	// The sign of the zero imaginary part of a real pole decides which of the
+	// conjugate pair a band transform lists first. SciPy's prototypes carry
+	// -0 (Butterworth, Chebyshev I, Bessel) or +0 (Chebyshev II, elliptic);
+	// set it explicitly rather than rely on the libm of each architecture.
+	zero := 0.0
+	if ft == Butterworth || ft == Chebyshev1 || ft == Bessel {
+		zero = math.Copysign(0, -1)
+	}
+	for i, v := range proto.P {
+		if imag(v) == 0 {
+			proto.P[i] = complex(real(v), zero)
+		}
+	}
 	warped := w
 	fsd := 2.0
 	if !opt.Analog {
