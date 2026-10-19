@@ -172,7 +172,7 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 | octave hilbert | 128 | 21 (16.4%) | 187 | 3.53e-16 |
 | octave kaiser | 21 | 7 (33.3%) | 4 | 4.44e-16 |
 | octave kaiserord | 2 | 2 (100.0%) | 0 | 0.00e+00 |
-| octave remez | 31 | 0 (0.0%) | 89 | 2.38e-16 |
+| octave remez | 31 | 2 (6.5%) | 108 | 2.67e-16 |
 | peak_prominences | 105 | 105 (100.0%) | 0 | 0.00e+00 |
 | peak_widths | 105 | 105 (100.0%) | 0 | 0.00e+00 |
 | peak_widths heights | 105 | 105 (100.0%) | 0 | 0.00e+00 |
@@ -180,7 +180,7 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 | peak_widths right | 105 | 105 (100.0%) | 0 | 0.00e+00 |
 | periodogram | 1063 | 38 (3.6%) | 26057897812709868 | 6.01e-16 |
 | periodogram f | 1063 | 1063 (100.0%) | 0 | 0.00e+00 |
-| remez | 300 | 6 (2.0%) | 65885690 | 7.28e-14 |
+| remez | 300 | 11 (3.7%) | 65704905 | 7.30e-14 |
 | resample | 1672 | 252 (15.1%) | 5152 | 7.78e-16 |
 | resample window | 353 | 58 (16.4%) | 416 | 5.91e-16 |
 | resample window array | 472 | 140 (29.7%) | 1474 | 4.56e-16 |

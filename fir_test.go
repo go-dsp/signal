@@ -280,8 +280,15 @@ func TestRemezOracleSweep(t *testing.T) {
 		kw := KW{"type": typeNames[typ], "weight": F(weight)}
 		want, oerr := Oracle(t, "signal.remez", []any{n, F(bands), F(desired)}, kw)
 		if oerr != nil { // SciPy: "Failure to converge"
-			if err != ErrNotConverged {
-				t.Errorf("design %d (n=%d bands=%v): SciPy failed (%v), Go returned %v", i, n, bands, oerr, err)
+			// The stall test (the deviation no longer grows) compares two
+			// nearly equal numbers, so it turns on last bits that fused
+			// multiply-adds change between architectures: SciPy's
+			// recording (arm64) may stall where amd64 converges. Either
+			// outcome is accepted; the filter must be finite.
+			for _, v := range got {
+				if math.IsNaN(v) || math.IsInf(v, 0) {
+					t.Fatalf("design %d: non-finite tap %v (%v)", i, v, err)
+				}
 			}
 			stalls++
 			continue
@@ -372,6 +379,25 @@ func TestRemezErrors(t *testing.T) {
 	_ = math.Pi
 }
 
+// TestRemezTypeIIIBandShort is the regression for NaN taps: a type III
+// differentiator whose band stops short of 0.5 has a reduced response with a
+// pole at 0.5, so sampling the interpolant there (as the transform did before
+// SciPy's Chebyshev mapping was ported) gave -Inf and NaN taps. It also
+// stalls on arm64, where the previous pass's filter must be returned.
+func TestRemezTypeIIIBandShort(t *testing.T) {
+	for _, n := range []int{33, 65, 101} {
+		h, err := Remez(n, []float64{0, 0.370209387678557}, []float64{1}, &RemezOptions{Type: RemezDifferentiator})
+		if err != nil && err != ErrNotConverged {
+			t.Fatal(err)
+		}
+		for i, v := range h {
+			if math.IsNaN(v) || math.IsInf(v, 0) {
+				t.Fatalf("n=%d: tap %d is %v (%v)", n, i, v, err)
+			}
+		}
+	}
+}
+
 // TestRemezBaryAtNode checks that the interpolant takes the node's value at
 // a node (adjacent bands put two grid points on the same frequency).
 func TestRemezBaryAtNode(t *testing.T) {
@@ -379,6 +405,9 @@ func TestRemezBaryAtNode(t *testing.T) {
 	ad := []float64{1, 1, 1}
 	if v := baryEval(0, x, ad, []float64{3, 7, 5}); v != 7 {
 		t.Fatalf("at a node: %v, want 7", v)
+	}
+	if v := baryEval(1, x, ad, []float64{3, 7, 5}); v != 5 {
+		t.Fatalf("at the odd last node: %v, want 5", v)
 	}
 	h, err := Remez(31, []float64{0, 0.2, 0.2, 0.5}, []float64{1, 0}, nil)
 	if len(h) != 31 && err == nil {

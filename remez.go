@@ -96,6 +96,7 @@ func Remez(numtaps int, bands, desired []float64, o *RemezOptions) ([]float64, e
 		nfcns++
 	}
 	delf := 0.5 / (float64(opt.GridDensity) * float64(nfcns))
+	bandLo := edges[0] // before the grid moves it off zero
 	if neg && edges[0] < delf {
 		edges[0] = delf
 	}
@@ -174,66 +175,9 @@ func Remez(numtaps int, bands, desired []float64, o *RemezOptions) ([]float64, e
 		xg[j] = math.Cos(2 * math.Pi * f)
 	}
 	x, ad, y, converged := remezExchange(xg, des, wt, nfcns, opt.MaxIter)
-
-	amp := func(f float64) float64 { return baryEval(math.Cos(2*math.Pi*f), x, ad, y) }
-
-	// sample the amplitude response and transform to the impulse response
-	h := make([]float64, numtaps)
-	nf := float64(numtaps)
-	m := (nf - 1) / 2
-	k := (numtaps - 1) / 2
-	a := make([]float64, k+1)
-	for i := range a {
-		f := float64(i) / nf
-		a[i] = amp(f) * q(f)
-	}
-	// The angle 2π·i·t/N, t = n-(N-1)/2, is π·j/N with the integer
-	// j = i·(2n-N+1) mod 2N: one table of 2N sines or cosines replaces
-	// numtaps·k calls (and reduces the argument exactly). The response is
-	// symmetric (cosine) or antisymmetric (sine) about the centre, so only
-	// the first half is summed.
-	n2 := 2 * numtaps
-	tab := make([]float64, n2)
-	for j := range tab {
-		if neg {
-			tab[j] = math.Sin(math.Pi * float64(j) / nf)
-		} else {
-			tab[j] = math.Cos(math.Pi * float64(j) / nf)
-		}
-	}
-	for n := 0; n < (numtaps+1)/2; n++ {
-		t := float64(n) - m
-		step := ((2*n-numtaps+1)%n2 + n2) % n2 // j for i = 1
-		var s float64
-		j := 0
-		if !neg {
-			s = a[0]
-			for i := 1; i <= k; i++ {
-				j += step
-				if j >= n2 {
-					j -= n2
-				}
-				s += 2 * a[i] * tab[j]
-			}
-		} else {
-			for i := 1; i <= k; i++ {
-				j += step
-				if j >= n2 {
-					j -= n2
-				}
-				s -= 2 * a[i] * tab[j]
-			}
-			if !odd { // the Nyquist sample of a type IV filter
-				s -= q(0.5) * amp(0.5) * math.Sin(math.Pi*t)
-			}
-		}
-		h[n] = s / nf
-		if neg {
-			h[numtaps-1-n] = -h[n]
-		} else {
-			h[numtaps-1-n] = h[n]
-		}
-	}
+	whole := (bandLo == 0 && edges[2*nb-1] == 0.5) || nfcns <= 3
+	alpha := remezAlpha(x, ad, y, grid[0], grid[ngrid-1], nfcns, whole)
+	h := remezImpulse(alpha, numtaps, nfcns, neg, odd)
 	if !converged {
 		return h, ErrNotConverged
 	}
@@ -269,6 +213,9 @@ func remezExchange(xg, des, wt []float64, nfcns, itrmax int) (xo, ado, yo []floa
 	x := make([]float64, nz+1)
 	ad := make([]float64, nz+1)
 	y := make([]float64, nz+1)
+	px := make([]float64, nz+1) // the last accepted interpolant
+	pad := make([]float64, nz+1)
+	py := make([]float64, nz+1)
 	// errAt is the weighted error at grid point l (1-based).
 	errAt := func(l int) float64 {
 		return (baryEval(xg[l-1], x[1:], ad[1:], y[1:]) - des[l-1]) * wt[l-1]
@@ -316,10 +263,15 @@ func remezExchange(xg, des, wt []float64, nfcns, itrmax int) (xo, ado, yo []floa
 		}
 		if dev <= devl {
 			// The deviation stopped growing before the extremal set
-			// settled: SciPy raises "Failure to converge" here.
-			return x[1:], ad[1:], y[1:], false
+			// settled: SciPy raises "Failure to converge" here. The set
+			// just exchanged can hold a node twice (infinite weights);
+			// the best filter is the previous pass's.
+			return px[1:], pad[1:], py[1:], false
 		}
 		devl = dev
+		copy(px, x)
+		copy(pad, ad)
+		copy(py, y)
 		jchnge = 0
 		k1 = iext[1]
 		knz = iext[nz]
@@ -500,6 +452,164 @@ func remezExchange(xg, des, wt []float64, nfcns, itrmax int) (xo, ado, yo []floa
 			return x[1:], ad[1:], y[1:], true
 		}
 	}
+}
+
+// remezAlpha computes the cosine coefficients alpha[1..nfcns] (1-based) of
+// the best approximation from its barycentric interpolant (nodes x, weights
+// ad, values y), the second half of the FORTRAN subroutine remez. When the
+// bands do not span [0, 0.5] (whole false), the samples are taken at
+// Chebyshev points of the grid's own interval [g1, gN] and the coefficients
+// mapped back by a polynomial recurrence: sampling outside the bands would
+// extrapolate the interpolant, which diverges where the reduced response has
+// a pole (a type III differentiator at 0.5). The cosine sums use one table
+// of cn values instead of nfcns² calls.
+func remezAlpha(x, ad, y []float64, g1, gN float64, nfcns int, whole bool) []float64 {
+	nz, nm1 := nfcns+1, nfcns-1
+	cn := 2*nfcns - 1
+	delf := 1 / float64(cn)
+	const fsh = 1e-6
+	var aa, bb float64
+	if !whole {
+		dtemp := math.Cos(2 * math.Pi * g1)
+		dnum := math.Cos(2 * math.Pi * gN)
+		aa = 2 / (dtemp - dnum)
+		bb = -(dtemp + dnum) / (dtemp - dnum)
+	}
+	xs := make([]float64, nz+2) // 1-based, with the sentinel x[nz+1] = -2
+	copy(xs[1:], x)
+	xs[nz+1] = -2
+	a := make([]float64, nfcns+3)
+	l := 1
+	for j := 1; j <= nfcns; j++ {
+		ft := float64(j-1) * delf
+		xt := math.Cos(2 * math.Pi * ft)
+		if !whole {
+			xt = (xt - bb) / aa
+			ft = math.Acos(xt) / (2 * math.Pi)
+		}
+		for {
+			xe := xs[l]
+			if xt > xe {
+				if xt-xe < fsh {
+					a[j] = y[l-1]
+				} else {
+					a[j] = baryEval(math.Cos(2*math.Pi*ft), x, ad, y)
+				}
+				break
+			}
+			if xe-xt < fsh {
+				a[j] = y[l-1]
+				break
+			}
+			l++
+		}
+		if l > 1 {
+			l--
+		}
+	}
+	ct := make([]float64, cn) // cos(2π m / cn)
+	for m := range ct {
+		ct[m] = math.Cos(2 * math.Pi * float64(m) / float64(cn))
+	}
+	alpha := make([]float64, nfcns+3)
+	for j := 1; j <= nfcns; j++ {
+		var dtemp float64
+		m := 0
+		for k := 1; k <= nm1; k++ {
+			if m += j - 1; m >= cn {
+				m -= cn
+			}
+			dtemp += a[k+1] * ct[m]
+		}
+		alpha[j] = 2*dtemp + a[1]
+	}
+	for j := 2; j <= nfcns; j++ {
+		alpha[j] *= 2 / float64(cn)
+	}
+	alpha[1] /= float64(cn)
+	if !whole {
+		p := make([]float64, nfcns+3)
+		q := make([]float64, nfcns+3)
+		p[1] = 2*alpha[nfcns]*bb + alpha[nm1]
+		p[2] = 2 * aa * alpha[nfcns]
+		q[1] = alpha[nfcns-2] - alpha[nfcns]
+		for j := 2; j <= nm1; j++ {
+			if j >= nm1 {
+				aa *= 0.5
+				bb *= 0.5
+			}
+			p[j+1] = 0
+			for k := 1; k <= j; k++ {
+				a[k] = p[k]
+				p[k] = 2 * bb * a[k]
+			}
+			p[2] += a[1] * 2 * aa
+			for k := 1; k <= j-1; k++ {
+				p[k] += q[k] + aa*a[k+1]
+			}
+			for k := 3; k <= j+1; k++ {
+				p[k] += aa * a[k-1]
+			}
+			if j != nm1 {
+				for k := 1; k <= j; k++ {
+					q[k] = -a[k]
+				}
+				q[1] += alpha[nfcns-1-j]
+			}
+		}
+		copy(alpha[1:nfcns+1], p[1:nfcns+1])
+	}
+	return alpha
+}
+
+// remezImpulse assembles the numtaps-tap impulse response from the cosine
+// coefficients alpha (1-based, zero past nfcns), as SciPy's pre_remez does
+// for the four symmetry types.
+func remezImpulse(alpha []float64, numtaps, nfcns int, neg, odd bool) []float64 {
+	h := make([]float64, numtaps+1) // 1-based
+	nz, nm1 := nfcns+1, nfcns-1
+	// alpha[0] is read when nfcns = 1 (nm1 = 0); it is 0, and that tap is
+	// overwritten below, as in SciPy.
+	al := func(i int) float64 { return alpha[i] }
+	switch {
+	case !neg && odd:
+		for j := 1; j <= nm1; j++ {
+			h[j] = 0.5 * al(nz-j)
+		}
+		h[nfcns] = al(1)
+	case !neg:
+		h[1] = 0.25 * al(nfcns)
+		for j := 2; j <= nm1; j++ {
+			h[j] = 0.25 * (al(nz-j) + al(nfcns+2-j))
+		}
+		h[nfcns] = 0.5*al(1) + 0.25*al(2)
+	case odd:
+		h[1] = 0.25 * al(nfcns)
+		h[2] = 0.25 * al(nm1)
+		for j := 3; j <= nm1; j++ {
+			h[j] = 0.25 * (al(nz-j) - al(nfcns+3-j))
+		}
+		h[nfcns] = 0.5*al(1) - 0.25*al(3)
+		h[nz] = 0
+	default:
+		h[1] = 0.25 * al(nfcns)
+		for j := 2; j <= nm1; j++ {
+			h[j] = 0.25 * (al(nz-j) - al(nfcns+2-j))
+		}
+		h[nfcns] = 0.5*al(1) - 0.25*al(2)
+	}
+	for j := 1; j <= nfcns; j++ {
+		k := numtaps + 1 - j
+		if neg {
+			h[k] = -h[j]
+		} else {
+			h[k] = h[j]
+		}
+	}
+	if neg && odd {
+		h[nz] = 0
+	}
+	return h[1:]
 }
 
 // lagrangeWeight is the barycentric weight of node k among x[1..n]
