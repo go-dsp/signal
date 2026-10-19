@@ -62,13 +62,14 @@ func convolveDirect(x, h []float64) []float64 {
 	}
 	out := make([]float64, len(x)+len(h)-1)
 	if len(h) >= simdDotMin {
-		// one SIMD dot product per output sample over the zero-padded signal
+		// Over the zero-padded signal, out[n] = Σ_k hr[k] xp[n+k]: eight
+		// outputs at a time, each a chain of multiply-adds in a register (a
+		// per-sample dot-product call costs more than it computes at these
+		// lengths).
 		hr := reversed(h)
 		xp := make([]float64, len(x)+2*(len(h)-1))
 		copy(xp[len(h)-1:], x)
-		for n := range out {
-			out[n] = dot(hr, xp[n:n+len(h)])
-		}
+		correlate8(out, hr, xp)
 		return out
 	}
 	for j, hv := range h {
@@ -78,6 +79,65 @@ func convolveDirect(x, h []float64) []float64 {
 		axpy(out[j:j+len(x)], hv, x)
 	}
 	return out
+}
+
+// correlate8 sets out[n] = Σ_k hr[k]*xp[n+k] (k ascending) for every n, with
+// len(xp) >= len(out)+len(hr)-1, eight outputs per pass in registers.
+func correlate8(out, hr, xp []float64) {
+	m := len(hr)
+	n := 0
+	for ; n+8 <= len(out); n += 8 {
+		w := xp[n : n+m+7]
+		var s0, s1, s2, s3, s4, s5, s6, s7 float64
+		var t0, t1, t2, t3, t4, t5, t6, t7 float64
+		// Two taps per step share one load of nine window samples, and the
+		// even and odd taps go to separate partial sums: sixteen independent
+		// multiply-add chains, so the FMA latency no longer bounds the loop.
+		k := 0
+		for ; k+2 <= m; k += 2 {
+			ha, hb := hr[k], hr[k+1]
+			v := w[k : k+9]
+			s0 += ha * v[0]
+			t0 += hb * v[1]
+			s1 += ha * v[1]
+			t1 += hb * v[2]
+			s2 += ha * v[2]
+			t2 += hb * v[3]
+			s3 += ha * v[3]
+			t3 += hb * v[4]
+			s4 += ha * v[4]
+			t4 += hb * v[5]
+			s5 += ha * v[5]
+			t5 += hb * v[6]
+			s6 += ha * v[6]
+			t6 += hb * v[7]
+			s7 += ha * v[7]
+			t7 += hb * v[8]
+		}
+		s0, s1, s2, s3 = s0+t0, s1+t1, s2+t2, s3+t3
+		s4, s5, s6, s7 = s4+t4, s5+t5, s6+t6, s7+t7
+		for ; k < m; k++ {
+			hk := hr[k]
+			v := w[k : k+8]
+			s0 += hk * v[0]
+			s1 += hk * v[1]
+			s2 += hk * v[2]
+			s3 += hk * v[3]
+			s4 += hk * v[4]
+			s5 += hk * v[5]
+			s6 += hk * v[6]
+			s7 += hk * v[7]
+		}
+		out[n], out[n+1], out[n+2], out[n+3] = s0, s1, s2, s3
+		out[n+4], out[n+5], out[n+6], out[n+7] = s4, s5, s6, s7
+	}
+	for ; n < len(out); n++ {
+		var s float64
+		for k, hk := range hr {
+			s += hk * xp[n+k]
+		}
+		out[n] = s
+	}
 }
 
 // axpy adds a*x to y (len(y) == len(x)).

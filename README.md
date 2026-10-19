@@ -20,6 +20,13 @@ windows), [go-numerics/special](https://github.com/go-numerics/special)
 [go-simd/floats](https://github.com/go-simd/floats) (the assembly dot
 product used by the FIR kernels).
 
+`remez.go`'s exchange follows the Parks–McClellan program of J. H. McClellan,
+T. W. Parks and L. R. Rabiner (IEEE Trans. Audio Electroacoust., 1973) as
+SciPy's `_sigtoolsmodule.cc` carries it in E. Kvaleberg's C translation
+(SciPy License, BSD-3-Clause; Copyright 2005 Travis Oliphant and the SciPy
+developers); its control flow and label numbers are kept so the two read side
+by side.
+
 ## Conventions
 
 * Signals and coefficients are `[]float64`; filters have real coefficients and
@@ -96,9 +103,18 @@ and Bessel designs, high-order transfer functions).
 ## Performance
 
 [docs/perf.md](docs/perf.md): one core against SciPy on the same host, in
-interleaved rounds, with the load average checked. The FIR kernels call the
-SIMD dot product of go-simd/floats; the recursions (`LFilter`, `SOSFilt`) are
-serial by nature and plain Go loops.
+interleaved rounds, with the load average checked
+(`-perf -perfcase <regexp>` measures a subset without rewriting the table).
+The FIR kernels call the SIMD dot product of go-simd/floats; the recursions
+are serial by nature, so `SOSFilt` runs four (or two) sections sample-major
+to overlap their dependency chains and the FIR form of `LFilter` is a direct
+chain eight outputs wide, both bit-identical to the one-section,
+one-output form. `Remez` runs the McClellan–Parks–Rabiner exchange (its
+search walks the error curve from each extremum instead of evaluating the
+whole grid every iteration), `PeakProminences` finds every base in two
+monotonic-stack passes (O(n), where the per-peak scan SciPy uses is
+O(n·peaks)), and `Spectrogram` computes its PSD through one reused spectrum
+buffer.
 
 ## Layout
 

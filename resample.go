@@ -609,10 +609,25 @@ func PeakProminences(x []float64, peaks []int, wlen float64) (prom []float64, le
 	}
 	prom = make([]float64, len(peaks))
 	left, right = make([]int, len(peaks)), make([]int, len(peaks))
-	for n, peak := range peaks {
+	for _, peak := range peaks {
 		if peak < 0 || peak >= len(x) {
 			return nil, nil, nil, fmt.Errorf("signal: peak %d is not a valid index for x", peak)
 		}
+	}
+	// Over the whole signal the bases of every sample come from two
+	// monotonic-stack passes in O(n), where scanning from each peak to the
+	// next higher sample costs O(n) per peak (SciPy's loop: seconds for
+	// 10^6 noisy samples). NaN stops a scan like a higher sample; that
+	// case, and a window, keep the scan.
+	if w < 2 && len(peaks) > 1 && !hasNaN(x) {
+		lb, rb := baseIndices(x)
+		for n, peak := range peaks {
+			left[n], right[n] = lb[peak], rb[peak]
+			prom[n] = x[peak] - math.Max(x[left[n]], x[right[n]])
+		}
+		return prom, left, right, nil
+	}
+	for n, peak := range peaks {
 		imin, imax := 0, len(x)-1
 		if w >= 2 {
 			imin = max(peak-w/2, imin)
@@ -639,6 +654,51 @@ func PeakProminences(x []float64, peaks []int, wlen float64) (prom []float64, le
 		prom[n] = x[peak] - math.Max(lmin, rmin)
 	}
 	return prom, left, right, nil
+}
+
+// baseIndices returns, for every sample i of x (no NaN), the index of the
+// minimum of x over the samples from i back to (not including) the nearest
+// earlier sample higher than x[i], the one nearest i on ties, and likewise
+// forwards: the left and right bases PeakProminences' scan finds for a peak
+// at i. Each stack entry carries the minimum of the run it absorbed.
+func baseIndices(x []float64) (lb, rb []int) {
+	n := len(x)
+	lb, rb = make([]int, n), make([]int, n)
+	type entry struct{ i, min int }
+	st := make([]entry, 0, 64)
+	for i := 0; i < n; i++ {
+		m := i
+		for len(st) > 0 && x[st[len(st)-1].i] <= x[i] {
+			if c := st[len(st)-1].min; x[c] < x[m] {
+				m = c
+			}
+			st = st[:len(st)-1]
+		}
+		lb[i] = m
+		st = append(st, entry{i, m})
+	}
+	st = st[:0]
+	for i := n - 1; i >= 0; i-- {
+		m := i
+		for len(st) > 0 && x[st[len(st)-1].i] <= x[i] {
+			if c := st[len(st)-1].min; x[c] < x[m] {
+				m = c
+			}
+			st = st[:len(st)-1]
+		}
+		rb[i] = m
+		st = append(st, entry{i, m})
+	}
+	return lb, rb
+}
+
+func hasNaN(x []float64) bool {
+	for _, v := range x {
+		if v != v {
+			return true
+		}
+	}
+	return false
 }
 
 // PeakWidths calculates the width of each peak at relHeight times its

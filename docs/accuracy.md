@@ -26,7 +26,7 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 | cheb2ord wn | 63 | 20 (31.7%) | 1323746378 | 2.43e-07 |
 | cheby1 | 6 | 1 (16.7%) | 63 | 1.70e-16 |
 | cheby2 | 6 | 5 (83.3%) | 1 | 1.37e-16 |
-| coherence | 1559 | 275 (17.6%) | 245 | 2.72e-14 |
+| coherence | 1559 | 284 (18.2%) | 222 | 1.61e-14 |
 | coherence f | 1559 | 1559 (100.0%) | 0 | 0.00e+00 |
 | convert/cplxpair | 220 | 220 (100.0%) | 0 | 0.00e+00 |
 | convert/cplxreal complex | 86 | 86 (100.0%) | 0 | 0.00e+00 |
@@ -38,20 +38,20 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 | convert/zpk2sos | 7182 | 6934 (96.5%) | 2 | 2.69e-16 |
 | convert/zpk2tf den | 514 | 147 (28.6%) | 5424 | 3.25e-15 |
 | convert/zpk2tf num | 496 | 162 (32.7%) | 11006841 | 2.74e-15 |
-| convolve auto | 10479 | 2608 (24.9%) | 11484 | 8.83e-16 |
-| convolve direct | 10479 | 2616 (25.0%) | 11417 | 8.83e-16 |
+| convolve auto | 10479 | 1855 (17.7%) | 40960 | 1.41e-15 |
+| convolve direct | 10479 | 1857 (17.7%) | 40960 | 1.41e-15 |
 | convolve fft | 10479 | 820 (7.8%) | 58622 | 1.57e-15 |
-| correlate auto | 10479 | 2538 (24.2%) | 589824 | 1.80e-15 |
-| correlate direct | 10479 | 2611 (24.9%) | 589824 | 1.80e-15 |
+| correlate auto | 10479 | 1906 (18.2%) | 17152 | 1.79e-15 |
+| correlate direct | 10479 | 2000 (19.1%) | 17152 | 1.79e-15 |
 | correlate fft | 10479 | 795 (7.6%) | 549978 | 8.40e-16 |
 | csd f | 1688 | 1688 (100.0%) | 0 | 0.00e+00 |
-| csd p | 3376 | 90 (2.7%) | 182263 | 5.95e-16 |
-| csd uneven | 130 | 5 (3.8%) | 2268 | 4.21e-16 |
+| csd p | 3376 | 107 (3.2%) | 474693 | 1.12e-15 |
+| csd uneven | 130 | 8 (6.2%) | 1756 | 9.80e-16 |
 | csd uneven f | 65 | 65 (100.0%) | 0 | 0.00e+00 |
 | decimate | 2784 | 317 (11.4%) | 561152 | 2.64e-14 |
 | deconvolve quot | 39 | 39 (100.0%) | 0 | 0.00e+00 |
 | deconvolve rem | 48 | 44 (91.7%) | 8709680204357828608 | 1.34e-16 |
-| detrend | 600 | 90 (15.0%) | 256 | 4.02e-16 |
+| detrend | 600 | 345 (57.5%) | 256 | 4.02e-16 |
 | dpss ratios | 77 | 9 (11.7%) | 8721734050048620544 | 4.22e-15 |
 | dpss window | 16950 | 156 (0.9%) | 8818027132053350400 | 1.54e-13 |
 | ellip | 12 | 8 (66.7%) | 2 | 1.27e-16 |
@@ -92,20 +92,20 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 | hilbert | 950 | 172 (18.1%) | 8739644495060389888 | 1.21e-15 |
 | iirdesign analog | 16 | 12 (75.0%) | 1 | 1.33e-16 |
 | iirdesign fs | 12 | 2 (16.7%) | 2 | 1.38e-16 |
-| iirdesign k | 16 | 0 (0.0%) | 2664265013 | 3.79e-07 |
-| iirdesign poles | 354 | 107 (30.2%) | 2564931370 | 9.30e-08 |
-| iirdesign zeros | 354 | 192 (54.2%) | 1607276521 | 4.53e-08 |
-| iirfilter a | 900 | 371 (41.2%) | 768 | 7.14e-15 |
-| iirfilter b | 810 | 421 (52.0%) | 24 | 2.64e-15 |
+| iirdesign k | 16 | 0 (0.0%) | 2664265017 | 3.79e-07 |
+| iirdesign poles | 354 | 109 (30.8%) | 2564931370 | 9.30e-08 |
+| iirdesign zeros | 354 | 194 (54.8%) | 1607276521 | 4.53e-08 |
+| iirfilter a | 900 | 388 (43.1%) | 1088 | 7.25e-15 |
+| iirfilter b | 810 | 427 (52.7%) | 23 | 2.54e-15 |
 | iirfilter gain | 464 | 134 (28.9%) | 1091 | 1.32e-13 |
-| iirfilter high ba den | 1032 | 76 (7.4%) | 37545157 | 9.63e-12 |
-| iirfilter high ba num | 1032 | 227 (22.0%) | 339056478 | 1.17e-08 |
-| iirfilter high poles | 2016 | 788 (39.1%) | 583 | 4.51e-16 |
-| iirfilter high sos | 3024 | 2078 (68.7%) | 1538 | 4.44e-16 |
+| iirfilter high ba den | 1032 | 74 (7.2%) | 37545157 | 9.63e-12 |
+| iirfilter high ba num | 1032 | 226 (21.9%) | 339056478 | 1.17e-08 |
+| iirfilter high poles | 2016 | 784 (38.9%) | 583 | 4.51e-16 |
+| iirfilter high sos | 3024 | 2076 (68.7%) | 1538 | 4.44e-16 |
 | iirfilter high zeros | 2016 | 1694 (84.0%) | 1538 | 8.75e-16 |
-| iirfilter poles | 8808 | 3947 (44.8%) | 2794 | 3.62e-14 |
-| iirfilter sos | 8586 | 6220 (72.4%) | 207 | 2.26e-15 |
-| iirfilter zeros | 7828 | 6362 (81.3%) | 9748 | 2.74e-14 |
+| iirfilter poles | 8808 | 4003 (45.4%) | 2794 | 3.62e-14 |
+| iirfilter sos | 8586 | 6268 (73.0%) | 207 | 2.26e-15 |
+| iirfilter zeros | 7828 | 6380 (81.5%) | 9748 | 2.74e-14 |
 | iirnotch a | 9 | 7 (77.8%) | 11 | 1.92e-16 |
 | iirnotch b | 9 | 7 (77.8%) | 11 | 1.92e-16 |
 | iirpeak a | 9 | 7 (77.8%) | 11 | 1.92e-16 |
@@ -132,8 +132,8 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 | lp2bs a | 141 | 125 (88.7%) | 2 | 3.98e-16 |
 | lp2bs b | 141 | 131 (92.9%) | 1 | 1.46e-16 |
 | lp2bs_zpk k | 9 | 8 (88.9%) | 1 | 2.00e-16 |
-| lp2bs_zpk p | 180 | 132 (73.3%) | 2 | 2.92e-16 |
-| lp2bs_zpk z | 180 | 154 (85.6%) | 2 | 1.60e-16 |
+| lp2bs_zpk p | 180 | 144 (80.0%) | 2 | 2.92e-16 |
+| lp2bs_zpk z | 180 | 172 (95.6%) | 2 | 1.43e-16 |
 | lp2hp a | 158 | 152 (96.2%) | 1 | 1.93e-16 |
 | lp2hp b | 158 | 155 (98.1%) | 1 | 1.76e-16 |
 | lp2hp_zpk k | 9 | 8 (88.9%) | 1 | 2.00e-16 |
@@ -146,20 +146,47 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 | lp2lp_zpk z | 66 | 66 (100.0%) | 0 | 0.00e+00 |
 | oaconvolve | 10479 | 863 (8.2%) | 58622 | 1.57e-15 |
 | oaconvolve long | 100598 | 4786 (4.8%) | 427609 | 1.02e-15 |
+| octave blackman | 21 | 15 (71.4%) | 33 | 1.11e-16 |
+| octave butter_band3 | 14 | 4 (28.6%) | 3 | 1.63e-16 |
+| octave butter_high3 | 8 | 5 (62.5%) | 2 | 2.22e-16 |
+| octave butter_low4 | 10 | 6 (60.0%) | 7 | 4.24e-16 |
+| octave butter_stop2 | 10 | 4 (40.0%) | 6 | 8.68e-16 |
+| octave buttord | 2 | 2 (100.0%) | 0 | 0.00e+00 |
+| octave cheb1ord | 2 | 2 (100.0%) | 0 | 0.00e+00 |
+| octave chebwin | 21 | 7 (33.3%) | 719 | 2.49e-15 |
+| octave cheby1_4 | 10 | 7 (70.0%) | 2 | 1.64e-16 |
+| octave cheby2_4 | 10 | 7 (70.0%) | 2 | 1.98e-17 |
+| octave conv | 67 | 62 (92.5%) | 1 | 1.06e-16 |
+| octave detrend | 64 | 0 (0.0%) | 96 | 2.47e-16 |
+| octave ellip_4 | 10 | 1 (10.0%) | 159317895567 | 9.97e-06 |
+| octave ellipord | 2 | 2 (100.0%) | 0 | 0.00e+00 |
+| octave filter | 64 | 10 (15.6%) | 1651 | 7.86e-16 |
+| octave findpeaks | 5 | 5 (100.0%) | 0 | 0.00e+00 |
+| octave fir1_band | 31 | 0 (0.0%) | 207257923299921888 | 4.97e-03 |
+| octave fir1_high | 31 | 0 (0.0%) | 198640945155742848 | 1.36e-03 |
+| octave fir1_low | 31 | 0 (0.0%) | 208040435222872320 | 3.16e-03 |
+| octave fir2 | 31 | 0 (0.0%) | 2642859147624990 | 2.88e-04 |
+| octave firls | 31 | 0 (0.0%) | 823 | 1.74e-15 |
+| octave freqz | 64 | 4 (6.2%) | 654210 | 1.44e-15 |
+| octave hamming | 21 | 13 (61.9%) | 2 | 1.11e-16 |
+| octave hilbert | 128 | 21 (16.4%) | 187 | 3.53e-16 |
+| octave kaiser | 21 | 7 (33.3%) | 4 | 4.44e-16 |
+| octave kaiserord | 2 | 2 (100.0%) | 0 | 0.00e+00 |
+| octave remez | 31 | 0 (0.0%) | 89 | 2.38e-16 |
 | peak_prominences | 105 | 105 (100.0%) | 0 | 0.00e+00 |
 | peak_widths | 105 | 105 (100.0%) | 0 | 0.00e+00 |
 | peak_widths heights | 105 | 105 (100.0%) | 0 | 0.00e+00 |
 | peak_widths left | 105 | 105 (100.0%) | 0 | 0.00e+00 |
 | peak_widths right | 105 | 105 (100.0%) | 0 | 0.00e+00 |
-| periodogram | 1063 | 42 (4.0%) | 32972154693746688 | 9.37e-16 |
+| periodogram | 1063 | 38 (3.6%) | 26057897812709868 | 6.01e-16 |
 | periodogram f | 1063 | 1063 (100.0%) | 0 | 0.00e+00 |
-| remez | 300 | 5 (1.7%) | 14111189 | 4.80e-14 |
+| remez | 300 | 6 (2.0%) | 65885690 | 7.28e-14 |
 | resample | 1672 | 252 (15.1%) | 5152 | 7.78e-16 |
 | resample window | 353 | 58 (16.4%) | 416 | 5.91e-16 |
 | resample window array | 472 | 140 (29.7%) | 1474 | 4.56e-16 |
-| resample_poly | 2098 | 665 (31.7%) | 755 | 6.26e-16 |
+| resample_poly | 2098 | 662 (31.6%) | 755 | 6.26e-16 |
 | resample_poly constant | 300 | 107 (35.7%) | 34 | 2.59e-16 |
-| resample_poly cval | 400 | 62 (15.5%) | 104 | 5.26e-16 |
+| resample_poly cval | 400 | 19 (4.8%) | 104 | 5.26e-16 |
 | resample_poly edge | 300 | 104 (34.7%) | 34 | 2.61e-16 |
 | resample_poly hann | 334 | 79 (23.7%) | 43 | 2.61e-16 |
 | resample_poly line | 300 | 106 (35.3%) | 34 | 2.61e-16 |
@@ -179,8 +206,8 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 | sosfreqz h | 500 | 150 (30.0%) | 223 | 8.21e-16 |
 | sosfreqz w | 250 | 250 (100.0%) | 0 | 0.00e+00 |
 | spectrogram f | 1164 | 1164 (100.0%) | 0 | 0.00e+00 |
-| spectrogram magnitude | 4245 | 467 (11.0%) | 33485 | 1.40e-14 |
-| spectrogram psd | 4245 | 206 (4.9%) | 62385 | 2.53e-15 |
+| spectrogram magnitude | 4245 | 593 (14.0%) | 22355 | 7.00e-15 |
+| spectrogram psd | 4245 | 204 (4.8%) | 41647 | 1.08e-15 |
 | spectrogram t | 280 | 280 (100.0%) | 0 | 0.00e+00 |
 | stft | 21356 | 2211 (10.4%) | 8714465278961909760 | 2.74e-15 |
 | stft f | 408 | 408 (100.0%) | 0 | 0.00e+00 |
@@ -206,8 +233,8 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 | upfirdn symmetric | 333 | 162 (48.6%) | 973 | 3.10e-16 |
 | upfirdn wrap | 333 | 170 (51.1%) | 55 | 3.13e-16 |
 | welch f | 1688 | 1688 (100.0%) | 0 | 0.00e+00 |
-| welch p | 1688 | 55 (3.3%) | 74943 | 1.14e-15 |
-| welch taps | 26 | 8 (30.8%) | 53 | 2.59e-16 |
+| welch p | 1688 | 73 (4.3%) | 35301 | 1.14e-15 |
+| welch taps | 26 | 3 (11.5%) | 9 | 3.89e-16 |
 | welch taps f | 26 | 26 (100.0%) | 0 | 0.00e+00 |
 | window barthann | 744 | 449 (60.3%) | 49 | 2.23e-16 |
 | window bartlett | 744 | 581 (78.1%) | 16 | 1.67e-16 |
@@ -229,7 +256,7 @@ coefficients and spectra, where elementwise ULPs near zero are noise).
 | window hann | 744 | 324 (43.5%) | 512 | 5.57e-16 |
 | window hann_periodic | 8 | 4 (50.0%) | 2 | 1.11e-16 |
 | window hann_symmetric | 8 | 5 (62.5%) | 2 | 1.17e-16 |
-| window kaiser | 1488 | 835 (56.1%) | 14 | 1.40e-15 |
+| window kaiser | 1488 | 847 (56.9%) | 14 | 1.40e-15 |
 | window nuttall | 744 | 268 (36.0%) | 488 | 4.45e-16 |
 | window parzen | 744 | 636 (85.5%) | 4 | 2.22e-16 |
 | window triang | 744 | 744 (100.0%) | 0 | 0.00e+00 |

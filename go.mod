@@ -4,8 +4,8 @@ go 1.27.2
 
 require (
 	github.com/go-fft/fft v0.27.1
-	github.com/go-numerics/special v0.1.0
-	github.com/go-simd/floats v0.3.1
+	github.com/go-numerics/special v0.2.0
+	github.com/go-simd/floats v0.4.0
 )
 
-require golang.org/x/sys v0.48.0 // indirect
+require golang.org/x/sys v0.49.0 // indirect

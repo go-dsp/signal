@@ -2,6 +2,8 @@ package signal
 
 import (
 	"math"
+	"math/rand/v2"
+	"slices"
 	"testing"
 )
 
@@ -231,6 +233,119 @@ func TestRemezOracle(t *testing.T) {
 	}
 }
 
+// TestRemezOracleSweep compares a seeded sweep of designs with SciPy: two
+// and three bands, narrow and wide transitions, weights, even and odd
+// lengths, differentiators and Hilbert transformers. Between them they take
+// the exchange's rarer branches (an extremum gained at either end of the
+// grid, the set shifted by one, the deviation no longer growing).
+func TestRemezOracleSweep(t *testing.T) {
+	r := rand.New(rand.NewPCG(17, 29))
+	typeNames := map[RemezType]string{RemezBandpass: "bandpass", RemezDifferentiator: "differentiator", RemezHilbert: "hilbert"}
+	worst, stalls, judged := 0.0, 0, 0
+	for i := 0; i < 40; i++ {
+		n := 11 + r.IntN(60)
+		var bands, desired, weight []float64
+		typ := RemezBandpass
+		switch i % 8 {
+		case 6:
+			typ = RemezDifferentiator
+			bands, desired, weight = []float64{0, 0.3 + 0.15*r.Float64()}, []float64{1}, []float64{1}
+		case 7:
+			typ = RemezHilbert
+			lo := 0.02 + 0.05*r.Float64()
+			bands, desired, weight = []float64{lo, 0.5 - lo}, []float64{1}, []float64{1}
+		default:
+			nb := 2 + r.IntN(2)
+			edges := make([]float64, 2*nb)
+			for k := range edges {
+				edges[k] = r.Float64()
+			}
+			slices.Sort(edges)
+			// spread the edges over [0, 0.5] keeping transitions >= 0.02
+			for k := range edges {
+				edges[k] = 0.5 * (edges[k]*float64(2*nb-1) + float64(k)) / float64(4*nb-2)
+			}
+			edges[0], edges[len(edges)-1] = 0, 0.5
+			for k := 0; k < nb; k++ {
+				desired = append(desired, float64((k+i)%2))
+				weight = append(weight, 1+9*r.Float64())
+			}
+			bands = edges
+		}
+		o := RemezOptions{Type: typ, Weight: weight}
+		got, err := Remez(n, bands, desired, &o)
+		if err != nil && err != ErrNotConverged {
+			t.Fatalf("design %d (n=%d bands=%v): %v", i, n, bands, err)
+		}
+		kw := KW{"type": typeNames[typ], "weight": F(weight)}
+		want, oerr := Oracle(t, "signal.remez", []any{n, F(bands), F(desired)}, kw)
+		if oerr != nil { // SciPy: "Failure to converge"
+			if err != ErrNotConverged {
+				t.Errorf("design %d (n=%d bands=%v): SciPy failed (%v), Go returned %v", i, n, bands, oerr, err)
+			}
+			stalls++
+			continue
+		}
+		h := want.F()
+		if d := normDiff(got, h); d <= 1e-3 {
+			worst = math.Max(worst, d)
+			continue
+		}
+		// Coefficients can differ widely when the minimax error is near
+		// rounding level (the transition bands are unconstrained); then
+		// the criterion itself judges: the weighted band error.
+		eg := remezBandError(got, bands, desired, weight, typ)
+		es := remezBandError(h, bands, desired, weight, typ)
+		if !(eg <= 1.25*es+1e-12) {
+			t.Errorf("design %d (n=%d bands=%.4v): band error %.4g, SciPy %.4g", i, n, bands, eg, es)
+		}
+		judged++
+	}
+	t.Logf("worst normwise difference from SciPy %.3g; %d designs judged by band error; %d fail to converge in both", worst, judged, stalls)
+}
+
+// normDiff is max|a-b| / max|b|.
+func normDiff(a, b []float64) float64 {
+	if len(a) != len(b) {
+		return math.Inf(1)
+	}
+	var d, m float64
+	for i := range b {
+		d = math.Max(d, math.Abs(a[i]-b[i]))
+		m = math.Max(m, math.Abs(b[i]))
+	}
+	return d / m
+}
+
+// remezBandError is the Remez criterion for h: the largest weighted
+// deviation of the amplitude from the desired response over the bands,
+// sampled at 4000 points per band (the differentiator's desired response
+// and weight scale with frequency, as in Remez).
+func remezBandError(h, bands, desired, weight []float64, typ RemezType) float64 {
+	worst := 0.0
+	for b := range desired {
+		lo, hi := bands[2*b], bands[2*b+1]
+		for k := 0; k <= 4000; k++ {
+			f := lo + (hi-lo)*float64(k)/4000
+			var re, im float64
+			for n, v := range h {
+				s, c := math.Sincos(2 * math.Pi * f * float64(n))
+				re += v * c
+				im -= v * s
+			}
+			d, w := desired[b], weight[b]
+			if typ == RemezDifferentiator {
+				d *= f
+				if desired[b] >= 0.0001 && f > 0 {
+					w /= f
+				}
+			}
+			worst = math.Max(worst, w*math.Abs(math.Hypot(re, im)-d))
+		}
+	}
+	return worst
+}
+
 func TestRemezErrors(t *testing.T) {
 	b, d := []float64{0, 0.1, 0.15, 0.5}, []float64{1, 0}
 	for i, f := range []func() error{
@@ -245,6 +360,7 @@ func TestRemezErrors(t *testing.T) {
 		func() error { _, e := Remez(31, []float64{0, 0.1, 0.15, 0.6}, d, nil); return e },
 		func() error { _, e := Remez(31, b, d, &RemezOptions{Weight: []float64{1, 0}}); return e },
 		func() error { _, e := Remez(31, []float64{0, 0.0001, 0.0002, 0.0003}, d, nil); return e },
+		func() error { _, e := Remez(1<<20, b, d, &RemezOptions{GridDensity: 4096}); return e },
 	} {
 		mustErr(t, "remez error "+string(rune('a'+i)), f())
 	}
@@ -256,41 +372,16 @@ func TestRemezErrors(t *testing.T) {
 	_ = math.Pi
 }
 
-func TestRemezExchange(t *testing.T) {
-	cases := []struct {
-		e    []float64
-		want int
-		ok   bool
-		idx  []int
-	}{
-		{[]float64{1, 2, 1}, 3, false, nil},
-		{[]float64{2, 1, 3, -1}, 2, true, []int{2, 3}},
-		{[]float64{3, 1, 2, -1}, 2, true, []int{0, 3}},
-		{[]float64{3, -1, 2, -4}, 2, true, []int{2, 3}},
-		{[]float64{5, -1, 2, -4}, 3, true, []int{0, 1, 2}},
-		{[]float64{-1, 1}, 2, true, []int{0, 1}},
+// TestRemezBaryAtNode checks that the interpolant takes the node's value at
+// a node (adjacent bands put two grid points on the same frequency).
+func TestRemezBaryAtNode(t *testing.T) {
+	x := []float64{-1, 0, 1}
+	ad := []float64{1, 1, 1}
+	if v := baryEval(0, x, ad, []float64{3, 7, 5}); v != 7 {
+		t.Fatalf("at a node: %v, want 7", v)
 	}
-	for i, c := range cases {
-		got, ok := exchange(c.e, c.want)
-		if ok != c.ok || (ok && !equalInts(got, c.idx)) {
-			t.Errorf("case %d: got %v %v, want %v %v", i, got, ok, c.idx, c.ok)
-		}
+	h, err := Remez(31, []float64{0, 0.2, 0.2, 0.5}, []float64{1, 0}, nil)
+	if len(h) != 31 && err == nil {
+		t.Fatalf("adjacent bands: %d taps, %v", len(h), err)
 	}
-	old := exchangeFn
-	exchangeFn = func([]float64, int) ([]int, bool) { return nil, false }
-	_, err := Remez(31, []float64{0, 0.1, 0.15, 0.5}, []float64{1, 0}, nil)
-	exchangeFn = old
-	mustErr(t, "exchange failure", err)
-}
-
-func equalInts(a, b []int) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
 }

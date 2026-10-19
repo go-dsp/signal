@@ -3,6 +3,8 @@ package signal
 import (
 	"errors"
 	"math"
+
+	"github.com/go-simd/floats"
 )
 
 // sturmCount returns the number of eigenvalues of the symmetric tridiagonal
@@ -185,11 +187,14 @@ func solveDense(a [][]float64, b []float64) error {
 		}
 		a[c], a[p] = a[p], a[c]
 		b[c], b[p] = b[p], b[c]
+		// Column c below the pivot is never read again, so the update
+		// starts at c+1.
+		pivot := a[c][c+1 : n]
 		for r := c + 1; r < n; r++ {
 			f := a[r][c] / a[c][c]
-			for k := c; k < n; k++ {
-				a[r][k] -= f * a[c][k]
-			}
+			// a[r][k] -= f*a[c][k] as one fused multiply-add per element
+			// (SIMD; what Go emits for the plain loop on arm64).
+			floats.Axpy(-f, pivot, a[r][c+1:n])
 			b[r] -= f * b[c]
 		}
 	}

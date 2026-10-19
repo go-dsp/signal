@@ -437,6 +437,9 @@ func Firls(numtaps int, bands, desired, weight []float64, fs float64) ([]float64
 			b[n] += (edge(hi) - edge(lo)) * w[k]
 		}
 	}
+	// Not Cholesky: these normal equations are usually not numerically
+	// positive definite (a pivot goes non-positive), so trying it first
+	// only adds work before the LU.
 	if err := solveDense(a, b); err != nil {
 		return nil, fmt.Errorf("signal: firls normal equations are singular: %w", err)
 	}
