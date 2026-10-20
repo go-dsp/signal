@@ -9,6 +9,7 @@ import (
 	"sort"
 
 	"github.com/go-fft/fft"
+	"github.com/go-simd/floats"
 )
 
 // DetrendType selects what is removed from each segment before analysis.
@@ -187,11 +188,9 @@ func hannPeriodic(n int, _ bool) []float64 { return Hann(n, false) }
 func detrendSegment(seg []float64, t DetrendType) {
 	switch t {
 	case DetrendConstant:
-		var m float64
-		for _, v := range seg {
-			m += v
-		}
-		m /= float64(len(seg))
+		// SIMD lane-blocked sum (go-simd/floats): no serial add chain, and
+		// closer to numpy's pairwise mean than a left-to-right loop.
+		m := floats.Sum(seg) / float64(len(seg))
 		for i := range seg {
 			seg[i] -= m
 		}
@@ -333,7 +332,7 @@ func crossSpectra(x, y []float64, s segSetup) [][]complex128 {
 	}
 	scale := complex(s.scale(), 0)
 	for k := range sx {
-		res := make([]complex128, len(sx[k]))
+		res := sx[k] // in place: element i reads only sx[k][i] and sy[k][i]
 		for i := range res {
 			res[i] = cmplx.Conj(sx[k][i]) * sy[k][i] * scale
 		}
@@ -346,6 +345,69 @@ func crossSpectra(x, y []float64, s segSetup) [][]complex128 {
 		}
 	}
 	return sx
+}
+
+// psdColumns is real(crossSpectra(x, nil, s)) transposed to [f][segment],
+// computed with the same complex operations per element (bit-identical) but
+// through one reused spectrum buffer and one output block, instead of a
+// spectrum, a scaled copy and a transposed copy per segment.
+func psdColumns(x []float64, s segSetup) [][]float64 {
+	step := s.nperseg - s.noverlap
+	nseg := (len(x)-s.nperseg)/step + 1
+	nf := s.nfft
+	if s.onesided {
+		nf = s.nfft/2 + 1
+	}
+	block := make([]float64, nf*nseg)
+	out := make([][]float64, nf)
+	for i := range out {
+		out[i] = block[i*nseg : (i+1)*nseg : (i+1)*nseg]
+	}
+	buf := make([]float64, s.nfft)
+	spec := make([]complex128, nf)
+	var rp *fft.RealPlan
+	var cp *fft.Plan
+	var cbuf []complex128
+	if s.onesided {
+		rp = fft.NewRealPlan(s.nfft)
+	} else {
+		cp = fft.NewPlan(s.nfft)
+		cbuf = make([]complex128, s.nfft)
+	}
+	// doubleOneSided's range: the interior of a one-sided spectrum.
+	dlo, dhi := 0, 0
+	if s.onesided {
+		dlo, dhi = 1, nf
+		if s.nfft%2 == 0 {
+			dhi--
+		}
+	}
+	scale := complex(s.scale(), 0)
+	for k := 0; k < nseg; k++ {
+		seg := buf[:s.nperseg]
+		copy(seg, x[k*step:k*step+s.nperseg])
+		detrendSegment(seg, s.det)
+		for i := range seg {
+			seg[i] *= s.win[i]
+		}
+		clear(buf[s.nperseg:])
+		if s.onesided {
+			rp.RFFT(spec, buf)
+		} else {
+			for i, v := range buf {
+				cbuf[i] = complex(v, 0)
+			}
+			cp.FFT(spec, cbuf)
+		}
+		for i, c := range spec {
+			v := cmplx.Conj(c) * c * scale
+			if i >= dlo && i < dhi {
+				v *= 2
+			}
+			out[i][k] = real(v)
+		}
+	}
+	return out
 }
 
 // medianBias is the bias of the median of n exponential variates.
@@ -536,8 +598,7 @@ func Spectrogram(x []float64, o *SpectralOptions, mode SpectrogramMode) (f, t []
 	}
 	step := seg.nperseg - seg.noverlap
 	if mode == SpecPSD {
-		sp := crossSpectra(x, nil, seg)
-		return seg.freqs(), segTimes(len(x), seg, step, false), transposeReal(sp, func(c complex128) float64 { return real(c) }), nil
+		return seg.freqs(), segTimes(len(x), seg, step, false), psdColumns(x, seg), nil
 	}
 	f, t, z := stftCore(x, seg, "", false)
 	switch mode {

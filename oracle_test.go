@@ -535,6 +535,11 @@ func writeAccuracy() error {
 	if !*update || len(acc) == 0 {
 		return nil
 	}
+	// A filtered run (-run) sees only some groups: writing would replace
+	// the full table with that subset.
+	if f := flag.Lookup("test.run"); f != nil && f.Value.String() != "" {
+		return nil
+	}
 	names := make([]string, 0, len(acc))
 	for k := range acc {
 		names = append(names, k)

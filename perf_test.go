@@ -27,6 +27,8 @@ import (
 
 var perfFlag = flag.Bool("perf", false, "measure performance against SciPy and write docs/perf.md")
 
+var perfOnly = flag.String("perfcase", "", "with -perf, measure only the cases whose name matches this regexp (docs/perf.md is not written)")
+
 const perfMaxLoad = 8.0
 
 func loadAvg() float64 {
@@ -137,6 +139,9 @@ func TestPerf(t *testing.T) {
 	var rows []string
 	const rounds = 5
 	for _, c := range cases {
+		if *perfOnly != "" && !regexp.MustCompile(*perfOnly).MatchString(c.name) {
+			continue
+		}
 		if l, ok := waitForLoad(5 * time.Minute); !ok {
 			rows = append(rows, fmt.Sprintf("| %s | not measured (load %.1f) | | |", c.name, l))
 			continue
@@ -169,6 +174,9 @@ func TestPerf(t *testing.T) {
 	b.WriteString("| case | Go | SciPy | Go / SciPy |\n|---|---:|---:|---:|\n")
 	for _, r := range rows {
 		b.WriteString(r + "\n")
+	}
+	if *perfOnly != "" {
+		return // a subset: docs/perf.md keeps the full table
 	}
 	if err := os.MkdirAll("docs", 0o755); err != nil {
 		t.Fatal(err)

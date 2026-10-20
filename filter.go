@@ -44,14 +44,97 @@ func LFilter(b, a, x, zi []float64) (y, zf []float64, err error) {
 // lfilterFIR is the direct form II transposed filter with a == 1.
 func lfilterFIR(b, x, z, y []float64) {
 	nb := len(b)
-	for n, xn := range x {
+	// Unrolled, the transposed direct form computes
+	//   y[n] = b0 x[n] + (b1 x[n-1] + (... + b_{nb-1} x[n-nb+1]))
+	// innermost first, and from n = nb-1 on the initial state no longer
+	// contributes. Those outputs are computed directly by that chain, four
+	// at a time in registers — the same operations in the same order, so
+	// the same bits — instead of rewriting the whole state per sample.
+	head := min(len(x), nb-1)
+	if nb <= 8 || len(x) < 2*nb {
+		head = len(x)
+	}
+	for n, xn := range x[:head] {
 		y[n] = z[0] + b[0]*xn
-		for i := 1; i < nb-1; i++ {
-			z[i-1] = z[i] + b[i]*xn
-		}
+		shiftAxpy(z[:max(nb-1, 1)], b, xn)
 		if nb > 1 {
 			z[nb-2] = b[nb-1] * xn
 		}
+	}
+	if head == len(x) {
+		return
+	}
+	last := b[nb-1]
+	n := head
+	// Eight outputs at a time: each step of a chain waits for the previous
+	// multiply-add, so eight chains keep the FMA units busy (they stay in
+	// registers; an array of sixteen spills to memory and is four times
+	// slower).
+	for ; n+8 <= len(x); n += 8 {
+		w := x[n-nb+1 : n+8]
+		s0, s1, s2, s3 := last*w[0], last*w[1], last*w[2], last*w[3]
+		s4, s5, s6, s7 := last*w[4], last*w[5], last*w[6], last*w[7]
+		for k := nb - 2; k >= 0; k-- {
+			bk := b[k]
+			v := w[nb-1-k : nb-1-k+8]
+			s0 = bk*v[0] + s0
+			s1 = bk*v[1] + s1
+			s2 = bk*v[2] + s2
+			s3 = bk*v[3] + s3
+			s4 = bk*v[4] + s4
+			s5 = bk*v[5] + s5
+			s6 = bk*v[6] + s6
+			s7 = bk*v[7] + s7
+		}
+		y[n], y[n+1], y[n+2], y[n+3] = s0, s1, s2, s3
+		y[n+4], y[n+5], y[n+6], y[n+7] = s4, s5, s6, s7
+	}
+	for ; n+4 <= len(x); n += 4 {
+		w := x[n-nb+1 : n+4]
+		s0, s1, s2, s3 := last*w[0], last*w[1], last*w[2], last*w[3]
+		for k := nb - 2; k >= 0; k-- {
+			bk := b[k]
+			o := nb - 1 - k
+			s0 = bk*w[o] + s0
+			s1 = bk*w[o+1] + s1
+			s2 = bk*w[o+2] + s2
+			s3 = bk*w[o+3] + s3
+		}
+		y[n], y[n+1], y[n+2], y[n+3] = s0, s1, s2, s3
+	}
+	for ; n < len(x); n++ {
+		s := last * x[n-nb+1]
+		for k := nb - 2; k >= 0; k-- {
+			s = b[k]*x[n-k] + s
+		}
+		y[n] = s
+	}
+	// The final state, z_k = b_{k+1} x[N-1] + (b_{k+2} x[N-2] + (...)), by
+	// the same chain.
+	end := len(x) - 1
+	for k := 0; k <= nb-2; k++ {
+		s := last * x[end-(nb-2-k)]
+		for j := nb - 2; j > k; j-- {
+			s = b[j]*x[end-(j-k-1)] + s
+		}
+		z[k] = s
+	}
+}
+
+// shiftAxpy computes z[i-1] = z[i] + b[i]*xn for i in [1, len(z)), four
+// independent lanes per step (each entry is read before the one below it is
+// written, so the lanes do not interfere); the same operations as the plain
+// loop.
+func shiftAxpy(z, b []float64, xn float64) {
+	m := len(z)
+	b = b[:m]
+	i := 1
+	for ; i+4 <= m; i += 4 {
+		v0, v1, v2, v3 := z[i]+b[i]*xn, z[i+1]+b[i+1]*xn, z[i+2]+b[i+2]*xn, z[i+3]+b[i+3]*xn
+		z[i-1], z[i], z[i+1], z[i+2] = v0, v1, v2, v3
+	}
+	for ; i < m; i++ {
+		z[i-1] = z[i] + b[i]*xn
 	}
 }
 
@@ -326,18 +409,76 @@ func SOSFilt(sos SOS, x []float64, zi [][2]float64) (y []float64, zf [][2]float6
 	zf = make([][2]float64, len(sos))
 	copy(zf, zi)
 	y = slices.Clone(x)
-	for s, sec := range sos {
-		b0, b1, b2, a1, a2 := sec[0], sec[1], sec[2], sec[4], sec[5]
-		z0, z1 := zf[s][0], zf[s][1]
-		for n, xc := range y {
-			xn := b0*xc + z0
-			z0 = b1*xc - a1*xn + z1
-			z1 = b2*xc - a2*xn
-			y[n] = xn
-		}
-		zf[s] = [2]float64{z0, z1}
+	// Sections run in groups of four (then two, then one), sample by sample
+	// within a group: each section's recursion is a serial chain, and
+	// interleaving independent chains lets the CPU overlap them. Every
+	// section performs the same operations on the same inputs as when run
+	// alone, so the result is bit for bit the same.
+	s := 0
+	for ; s+4 <= len(sos); s += 4 {
+		sosFilt4(sos[s:s+4], zf[s:s+4], y)
+	}
+	for ; s+2 <= len(sos); s += 2 {
+		sosFilt2(sos[s:s+2], zf[s:s+2], y)
+	}
+	for ; s < len(sos); s++ {
+		sosFilt1(sos[s], &zf[s], y)
 	}
 	return y, zf, nil
+}
+
+func sosFilt1(sec [6]float64, z *[2]float64, y []float64) {
+	b0, b1, b2, a1, a2 := sec[0], sec[1], sec[2], sec[4], sec[5]
+	z0, z1 := z[0], z[1]
+	for n, xc := range y {
+		xn := b0*xc + z0
+		z0 = b1*xc - a1*xn + z1
+		z1 = b2*xc - a2*xn
+		y[n] = xn
+	}
+	*z = [2]float64{z0, z1}
+}
+
+func sosFilt2(sec []([6]float64), z [][2]float64, y []float64) {
+	p0, p1, p2, pa1, pa2 := sec[0][0], sec[0][1], sec[0][2], sec[0][4], sec[0][5]
+	q0, q1, q2, qa1, qa2 := sec[1][0], sec[1][1], sec[1][2], sec[1][4], sec[1][5]
+	pz0, pz1, qz0, qz1 := z[0][0], z[0][1], z[1][0], z[1][1]
+	for n, xc := range y {
+		xp := p0*xc + pz0
+		pz0 = p1*xc - pa1*xp + pz1
+		pz1 = p2*xc - pa2*xp
+		xq := q0*xp + qz0
+		qz0 = q1*xp - qa1*xq + qz1
+		qz1 = q2*xp - qa2*xq
+		y[n] = xq
+	}
+	z[0], z[1] = [2]float64{pz0, pz1}, [2]float64{qz0, qz1}
+}
+
+func sosFilt4(sec []([6]float64), z [][2]float64, y []float64) {
+	p0, p1, p2, pa1, pa2 := sec[0][0], sec[0][1], sec[0][2], sec[0][4], sec[0][5]
+	q0, q1, q2, qa1, qa2 := sec[1][0], sec[1][1], sec[1][2], sec[1][4], sec[1][5]
+	r0, r1, r2, ra1, ra2 := sec[2][0], sec[2][1], sec[2][2], sec[2][4], sec[2][5]
+	s0, s1, s2, sa1, sa2 := sec[3][0], sec[3][1], sec[3][2], sec[3][4], sec[3][5]
+	pz0, pz1, qz0, qz1 := z[0][0], z[0][1], z[1][0], z[1][1]
+	rz0, rz1, sz0, sz1 := z[2][0], z[2][1], z[3][0], z[3][1]
+	for n, xc := range y {
+		xp := p0*xc + pz0
+		pz0 = p1*xc - pa1*xp + pz1
+		pz1 = p2*xc - pa2*xp
+		xq := q0*xp + qz0
+		qz0 = q1*xp - qa1*xq + qz1
+		qz1 = q2*xp - qa2*xq
+		xr := r0*xq + rz0
+		rz0 = r1*xq - ra1*xr + rz1
+		rz1 = r2*xq - ra2*xr
+		xs := s0*xr + sz0
+		sz0 = s1*xr - sa1*xs + sz1
+		sz1 = s2*xr - sa2*xs
+		y[n] = xs
+	}
+	z[0], z[1] = [2]float64{pz0, pz1}, [2]float64{qz0, qz1}
+	z[2], z[3] = [2]float64{rz0, rz1}, [2]float64{sz0, sz1}
 }
 
 // SOSFiltZI returns the initial state of each section for a unit step input
