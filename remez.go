@@ -261,7 +261,11 @@ func remezExchange(xg, des, wt []float64, nfcns, itrmax int) (xo, ado, yo []floa
 			y[j] = des[l-1] + float64(k)*dev/wt[l-1]
 			k = -k
 		}
-		if dev <= devl {
+		// A degenerate design (deviation at rounding level) can exchange
+		// two nodes onto the same abscissa: infinite weights, a NaN
+		// deviation that no comparison catches. That is a stall too (on
+		// the first pass the previous filter is zero, not NaN).
+		if dev <= devl || !finitePass(dev, ad[1:], y[1:]) {
 			// The deviation stopped growing before the extremal set
 			// settled: SciPy raises "Failure to converge" here. The set
 			// just exchanged can hold a node twice (infinite weights);
@@ -610,6 +614,20 @@ func remezImpulse(alpha []float64, numtaps, nfcns int, neg, odd bool) []float64 
 		h[nz] = 0
 	}
 	return h[1:]
+}
+
+// finitePass reports whether an exchange pass produced a usable
+// interpolant: a finite deviation, weights and values.
+func finitePass(dev float64, ad, y []float64) bool {
+	if math.IsNaN(dev) || math.IsInf(dev, 0) {
+		return false
+	}
+	for i := range ad {
+		if math.IsNaN(ad[i]) || math.IsInf(ad[i], 0) || math.IsNaN(y[i]) || math.IsInf(y[i], 0) {
+			return false
+		}
+	}
+	return true
 }
 
 // lagrangeWeight is the barycentric weight of node k among x[1..n]

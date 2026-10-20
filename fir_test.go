@@ -398,6 +398,28 @@ func TestRemezTypeIIIBandShort(t *testing.T) {
 	}
 }
 
+func TestRemezFinitePass(t *testing.T) {
+	inf, nan := math.Inf(1), math.NaN()
+	ok := []float64{1, 2}
+	for i, c := range []struct {
+		dev   float64
+		ad, y []float64
+		want  bool
+	}{
+		{1, ok, ok, true},
+		{nan, ok, ok, false},
+		{-inf, ok, ok, false},
+		{1, []float64{1, inf}, ok, false},
+		{1, []float64{nan, 1}, ok, false},
+		{1, ok, []float64{1, -inf}, false},
+		{1, ok, []float64{nan, 1}, false},
+	} {
+		if got := finitePass(c.dev, c.ad, c.y); got != c.want {
+			t.Errorf("case %d: %v, want %v", i, got, c.want)
+		}
+	}
+}
+
 // TestRemezBaryAtNode checks that the interpolant takes the node's value at
 // a node (adjacent bands put two grid points on the same frequency).
 func TestRemezBaryAtNode(t *testing.T) {
