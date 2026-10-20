@@ -398,6 +398,17 @@ func TestRemezTypeIIIBandShort(t *testing.T) {
 	}
 }
 
+func TestRemezFiniteOrNil(t *testing.T) {
+	if h, ok := finiteOrNil([]float64{1, 2}); !ok || len(h) != 2 {
+		t.Fatal("finite taps refused")
+	}
+	for _, bad := range []float64{math.NaN(), math.Inf(-1)} {
+		if h, ok := finiteOrNil([]float64{1, bad}); ok || h != nil {
+			t.Fatalf("%v accepted", bad)
+		}
+	}
+}
+
 func TestRemezFinitePass(t *testing.T) {
 	inf, nan := math.Inf(1), math.NaN()
 	ok := []float64{1, 2}

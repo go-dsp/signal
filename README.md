@@ -66,7 +66,9 @@ Differences worth knowing:
 * `STFT`/`ISTFT` follow SciPy's legacy `stft`/`istft` (the `ShortTimeFFT` class
   is not provided).
 * SciPy emits warnings where Go returns values: a singular group delay is set to
-  zero silently; `Remez` returns the best filter together with `ErrNotConverged`.
+  zero silently; `Remez` returns the best filter together with `ErrNotConverged`
+  (SciPy raises; a degenerate design whose taps would not be finite returns
+  nil).
 * `EllipAP` returns an error (SciPy returns NaN poles) when the stopband
   attenuation is below the passband ripple.
 * Bessel prototypes use exact integer polynomial coefficients refined in

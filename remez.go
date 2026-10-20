@@ -33,8 +33,10 @@ type RemezOptions struct {
 	Fs float64
 }
 
-// ErrNotConverged is returned (with the best filter found) by Remez when the
-// exchange algorithm does not converge within MaxIter iterations.
+// ErrNotConverged is returned by Remez, with the best filter found, when the
+// exchange does not converge within MaxIter iterations or its deviation stops
+// growing (SciPy raises "Failure to converge" there). For a degenerate design
+// whose filter would not be finite, the filter returned is nil.
 var ErrNotConverged = errors.New("signal: the Remez exchange did not converge; try a wider transition band")
 
 // Remez designs an optimal equiripple FIR filter with the Parks–McClellan
@@ -178,10 +180,25 @@ func Remez(numtaps int, bands, desired []float64, o *RemezOptions) ([]float64, e
 	whole := (bandLo == 0 && edges[2*nb-1] == 0.5) || nfcns <= 3
 	alpha := remezAlpha(x, ad, y, grid[0], grid[ngrid-1], nfcns, whole)
 	h := remezImpulse(alpha, numtaps, nfcns, neg, odd)
-	if !converged {
+	// A degenerate design (minimax error at rounding level) can leave an
+	// interpolant whose evaluation overflows on some architectures (the
+	// last bits of math.Cos differ on s390x): no filter is returned then.
+	h, finite := finiteOrNil(h)
+	if !converged || !finite {
 		return h, ErrNotConverged
 	}
 	return h, nil
+}
+
+// finiteOrNil returns h and true when every tap is finite, nil and false
+// otherwise.
+func finiteOrNil(h []float64) ([]float64, bool) {
+	for _, v := range h {
+		if math.IsNaN(v) || math.IsInf(v, 0) {
+			return nil, false
+		}
+	}
+	return h, true
 }
 
 // maxRemezGrid bounds the dense grid (32 MiB for each of its four buffers;
