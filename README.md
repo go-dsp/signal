@@ -4,6 +4,10 @@ Signal processing in pure Go (`CGO_ENABLED=0`): filter design and filtering,
 spectral estimation, resampling and peak finding, with the semantics of SciPy's
 `scipy.signal` and, where it differs, a note on MATLAB's.
 
+Released: **v0.1.0**. Documentation: <https://go-dsp.github.io/docs/latest/signal/>
+· organisation: <https://go-dsp.github.io/> · part of
+[go-scikit](https://go-scikit.github.io/).
+
 ```go
 import "github.com/go-dsp/signal"
 
