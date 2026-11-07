@@ -1,9 +1,29 @@
 # Performance against SciPy
 
-One core (GOMAXPROCS=1; the SciPy process runs with OMP/OpenBLAS threads set to 1), best of 5 interleaved rounds
-(a Go batch, then a SciPy batch of the same call, repeated), `uptime` checked before each case (load below 8).
-A ratio below 1 means this package is faster. Regenerate with
-`GOWORK=off go test -run TestPerf -perf -count=1 .`
+## Method (refbench)
+
+Measured by [refbench](https://github.com/go-scikit/refbench) (performance
+campaign wave W1, [go-scikit/roadmap#27](https://github.com/go-scikit/roadmap/issues/27)):
+one core on both sides (`GOMAXPROCS=1`; the SciPy process runs with OMP/OpenBLAS/MKL/VecLib threads at 1), each
+side a calibrated loop timed inside its own process, rounds alternating Go-then-SciPy and SciPy-then-Go, the
+1-minute load read before and after every round (gate: below 8), the verdict on the median with the
+quartiles. `ratio = Go / SciPy`; below 1 means this package is faster.
+
+```sh
+go test -run TestPerf .                        # CI mode: allocations, table, every public function has a case or an exemption
+go test -run TestPerf -cpu 1 -perf.run .       # measure; refuses at a load of 8 or more
+go test -run TestPerf -perf.record .           # allocation counts only (a deferred report)
+```
+
+[perf.json](perf.json) is the record, [perf-table.md](perf-table.md) is generated from it, and
+[perf-exempt.md](perf-exempt.md) names the public functions that have no case yet, with the reason.
+
+**Status 2026-11-07: timing deferred.** The host's 1-minute load was about 33 when this migration was made,
+so [perf-table.md](perf-table.md) holds allocation counts only (verdict "deferred"). The table below is the
+previous harness's, measured 2026-10-19 with a different statistic (best of 5 rather than the median) and
+kept until the first refbench timing run replaces it.
+
+## Previous measurement (best of 5, 2026-10-19)
 
 Host: darwin/arm64, 16 logical CPUs, go1.27.2; SciPy 1.18.1, NumPy 2.5.4. Load average at start 4.7, at end 4.1. Measured 2026-10-19.
 

@@ -109,8 +109,12 @@ and Bessel designs, high-order transfer functions).
 ## Performance
 
 [docs/perf.md](docs/perf.md): one core against SciPy on the same host, in
-interleaved rounds, with the load average checked
-(`-perf -perfcase <regexp>` measures a subset without rewriting the table).
+interleaved rounds, with the load average checked, driven by
+[refbench](https://github.com/go-scikit/refbench) (`go test -run TestPerf .`
+checks allocations, the table and that every public function has a case in
+`perf_test.go` or a reason in `docs/perf-exempt.md`; `-perf.run` measures).
+The current table is allocation counts only: timing is deferred until the host's
+load is below 8.
 The FIR kernels call the SIMD dot product of go-simd/floats; the recursions
 are serial by nature, so `SOSFilt` runs four (or two) sections sample-major
 to overlap their dependency chains and the FIR form of `LFilter` is a direct
