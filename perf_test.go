@@ -106,10 +106,12 @@ func perfCases(t *testing.T) []refbench.Case {
 }
 
 func TestPerf(t *testing.T) {
-	// Allocation counts are those of a plain amd64/arm64 build: the race
-	// detector, 32-bit and emulated architectures change them.
-	if perfRace || (runtime.GOARCH != "amd64" && runtime.GOARCH != "arm64") {
-		t.Skip("refbench CI mode runs on plain amd64/arm64 builds (the `perf` job)")
+	// Allocation counts are those of a plain arm64 build, the architecture
+	// docs/perf.json was recorded on: the race detector changes them, and so does
+	// the architecture (amd64 allocates one block fewer in periodogram,
+	// spectrogram and welch: go-fft and go-simd/floats choose other kernels).
+	if perfRace || runtime.GOARCH != "arm64" {
+		t.Skip("refbench CI mode runs on plain arm64 builds (the `perf` job, ubuntu-24.04-arm)")
 	}
 	rbtest.Perf(t, refbench.CIConfig{Root: ".", Cases: perfCases(t)}, refbench.Options{
 		Repo:        "go-dsp/signal",
