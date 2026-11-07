@@ -74,6 +74,19 @@ jobs:
           go build ./...
           go test ./...
 
+  # refbench's CI mode (no Python, no timing): allocation counts equal
+  # docs/perf.json, docs/perf-table.md is what perf.json generates, every
+  # public function has a case or an entry in docs/perf-exempt.md.
+  perf:
+    name: perf (refbench CI mode)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.27.3'
+      - run: go test -run TestPerf -count=1 -v .
+
   arch-qemu:
     name: arch ${{ matrix.goarch }} (qemu)
     runs-on: ubuntu-latest

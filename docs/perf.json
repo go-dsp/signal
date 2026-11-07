@@ -1,0 +1,526 @@
+{
+  "schema": 1,
+  "status": "deferred",
+  "date": "2026-11-07T21:11:35+01:00",
+  "commit": "2be038d",
+  "repo": "go-dsp/signal",
+  "go_version": "go1.27.3",
+  "machine": "darwin/arm64 (deferred: 1-minute load 33)",
+  "ref_versions": {
+    "numpy": "2.5.4",
+    "scipy": "1.18.1"
+  },
+  "max_load": 8,
+  "load": {
+    "min": 0,
+    "median": 0,
+    "max": 0
+  },
+  "valid": true,
+  "rows": [
+    {
+      "name": "sosfilt, 10^6 samples, order 8",
+      "func": "SOSFilt",
+      "reference": "scipy.signal (signal.sosfilt)",
+      "parity": "none",
+      "allocs": 2,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lfilter, 10^6 samples, order 4",
+      "func": "LFilter",
+      "reference": "scipy.signal (signal.lfilter)",
+      "parity": "none",
+      "allocs": 4,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lfilter FIR 101 taps, 10^6 samples",
+      "func": "LFilter",
+      "reference": "scipy.signal (signal.lfilter)",
+      "parity": "none",
+      "allocs": 4,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "filtfilt, 10^5 samples, order 4",
+      "func": "FiltFilt",
+      "reference": "scipy.signal (signal.filtfilt)",
+      "parity": "none",
+      "allocs": 17,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "sosfiltfilt, 10^6 samples, order 8",
+      "func": "SOSFiltFilt",
+      "reference": "scipy.signal (signal.sosfiltfilt)",
+      "parity": "none",
+      "allocs": 22,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "welch, 10^6 samples, nperseg 1024",
+      "func": "Welch",
+      "reference": "scipy.signal (signal.welch)",
+      "parity": "none",
+      "allocs": 1964,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "welch, 10^6 samples, nperseg 256 (default)",
+      "func": "Welch",
+      "reference": "scipy.signal (signal.welch)",
+      "parity": "none",
+      "allocs": 7823,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "periodogram, 2^18 samples",
+      "func": "Periodogram",
+      "reference": "scipy.signal (signal.periodogram)",
+      "parity": "none",
+      "allocs": 13,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "spectrogram, 10^5 samples",
+      "func": "Spectrogram",
+      "reference": "scipy.signal (signal.spectrogram)",
+      "parity": "none",
+      "allocs": 18,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "resample_poly 3/2, 2^18 samples",
+      "func": "ResamplePoly",
+      "reference": "scipy.signal (signal.resample_poly)",
+      "parity": "none",
+      "allocs": 26,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "resample_poly 1/4, 10^6 samples",
+      "func": "ResamplePoly",
+      "reference": "scipy.signal (signal.resample_poly)",
+      "parity": "none",
+      "allocs": 15,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "resample (FFT), 2^18 -\u003e 3*2^16",
+      "func": "Resample",
+      "reference": "scipy.signal (signal.resample)",
+      "parity": "none",
+      "allocs": 2,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "decimate by 8, 10^6 samples",
+      "func": "Decimate",
+      "reference": "scipy.signal (signal.decimate)",
+      "parity": "none",
+      "allocs": 110,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "upfirdn 3/2, 101 taps, 10^5 samples",
+      "func": "Upfirdn",
+      "reference": "scipy.signal (signal.upfirdn)",
+      "parity": "none",
+      "allocs": 24,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "convolve direct, 10^5 x 101",
+      "func": "Convolve",
+      "reference": "scipy.signal (signal.convolve)",
+      "parity": "none",
+      "allocs": 4,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "convolve direct, 10^5 x 1001",
+      "func": "Convolve",
+      "reference": "scipy.signal (signal.convolve)",
+      "parity": "none",
+      "allocs": 4,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "fftconvolve, 10^6 x 10^4",
+      "func": "FFTConvolve",
+      "reference": "scipy.signal (signal.fftconvolve)",
+      "parity": "none",
+      "allocs": 6,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "oaconvolve, 10^6 x 10^3",
+      "func": "OAConvolve",
+      "reference": "scipy.signal (signal.oaconvolve)",
+      "parity": "none",
+      "allocs": 397,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "hilbert, 2^18 samples",
+      "func": "Hilbert",
+      "reference": "scipy.signal (signal.hilbert)",
+      "parity": "none",
+      "allocs": 3,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "find_peaks with prominence, 10^6 samples",
+      "func": "FindPeaks",
+      "reference": "scipy.signal (signal.find_peaks)",
+      "parity": "none",
+      "allocs": 113,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "firwin, 4001 taps",
+      "func": "Firwin",
+      "reference": "scipy.signal (signal.firwin)",
+      "parity": "none",
+      "allocs": 3,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "firwin, 100001 taps (Kaiser)",
+      "func": "Firwin",
+      "reference": "scipy.signal (signal.firwin)",
+      "parity": "none",
+      "allocs": 3,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "remez, 101 taps",
+      "func": "Remez",
+      "reference": "scipy.signal (signal.remez)",
+      "parity": "none",
+      "allocs": 13,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "remez, 501 taps",
+      "func": "Remez",
+      "reference": "scipy.signal (signal.remez)",
+      "parity": "none",
+      "allocs": 13,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "firls, 301 taps",
+      "func": "Firls",
+      "reference": "scipy.signal (signal.firls)",
+      "parity": "none",
+      "allocs": 155,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "butter order 8 (zpk to sos)",
+      "func": "Butter",
+      "reference": "scipy.signal (signal.butter)",
+      "parity": "none",
+      "allocs": 87,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "ellip order 10 (zpk to sos)",
+      "func": "Ellip",
+      "reference": "scipy.signal (signal.ellip)",
+      "parity": "none",
+      "allocs": 116,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "dpss 1024, NW 4, K 7",
+      "func": "DPSS",
+      "reference": "scipy.signal (signal.windows.dpss)",
+      "parity": "none",
+      "allocs": 139,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    }
+  ]
+}
