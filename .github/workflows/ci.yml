@@ -81,7 +81,7 @@ jobs:
   # four spectral cases), so it runs where docs/perf.json was recorded: arm64.
   perf:
     name: perf (refbench CI mode)
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
