@@ -174,6 +174,37 @@ func Kaiser(beta float64) Window {
 	}
 }
 
+// KaiserBesselDerived is the Kaiser-Bessel-derived window with shape parameter
+// beta (scipy.signal.windows.kaiser_bessel_derived), the window of the AAC and
+// Vorbis-style MDCT codecs: the square root of the normalised running sum of a
+// Kaiser window of n/2+1 points, followed by its mirror image, so that the
+// squares of the two halves add up to one (Princen-Bradley). It is defined for an
+// even n only: an odd or negative n returns nil. The form is always symmetric:
+// sym is ignored, as in scipy.
+func KaiserBesselDerived(beta float64) Window {
+	return func(n int, sym bool) []float64 {
+		if n < 0 || n%2 != 0 {
+			return nil
+		}
+		w := make([]float64, n)
+		if n == 0 {
+			return w
+		}
+		k := Kaiser(beta)(n/2+1, true)
+		total := 0.0
+		for _, v := range k {
+			total += v
+		}
+		sum := 0.0
+		for i := 0; i < n/2; i++ {
+			sum += k[i]
+			w[i] = math.Sqrt(sum / total)
+			w[n-1-i] = w[i]
+		}
+		return w
+	}
+}
+
 // Tukey is the tapered cosine window; alpha is the fraction of the window
 // inside the cosine tapered regions (0 is rectangular, 1 is Hann).
 func Tukey(alpha float64) Window {

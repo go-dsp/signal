@@ -193,7 +193,7 @@ MATLAB cell is filled.
 | 126 | `triang` | `triang` | `Triang` | done | |
 | 127 | `tukey` | `tukeywin` | `Tukey` | done | |
 | 128 | `lanczos` | | | missing | none |
-| 129 | `kaiser_bessel_derived` | `kbdwin` | | missing | `Kaiser` (have), cumulative sums |
+| 129 | `kaiser_bessel_derived` | `kbdwin` | `KaiserBesselDerived` | done | even length only (nil otherwise); no `GetWindow` name yet |
 | 130 | | `window`, `wvtool`, `wintool` | `GetWindow` | partial | `window` front end; the tools are interactive |
 
 ## Peak finding
