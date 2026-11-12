@@ -84,6 +84,35 @@ func TestGetWindowOracle(t *testing.T) {
 	}
 }
 
+func TestKaiserBesselDerivedOracle(t *testing.T) {
+	for _, beta := range []float64{0, 2.5, 4, 6, 12} {
+		for _, n := range []int{2, 4, 8, 16, 128, 256, 1024, 2048} {
+			got := KaiserBesselDerived(beta)(n, true)
+			o := MustOracle(t, "signal.windows.kaiser_bessel_derived", []any{n, beta}, nil)
+			compareVec(t, "kaiser_bessel_derived", got, o.F(), 1e-13)
+			// Princen-Bradley: the squares of the two halves add up to one.
+			for i := 0; i < n/2; i++ {
+				if s := got[i]*got[i] + got[i+n/2]*got[i+n/2]; math.Abs(s-1) > 1e-13 {
+					t.Fatalf("beta %v n %d: w[%d]^2 + w[%d]^2 = %v", beta, n, i, i+n/2, s)
+				}
+			}
+		}
+	}
+	// scipy refuses sym=False (_windows.py), as it refuses an odd length; here both
+	// return nil, the package's "cannot be generated".
+	if w := KaiserBesselDerived(4)(16, false); w != nil {
+		t.Errorf("sym false: %v, want nil", w)
+	}
+	if w := KaiserBesselDerived(4)(0, true); w == nil || len(w) != 0 {
+		t.Errorf("n=0: %v, want an empty window", w)
+	}
+	for _, n := range []int{-2, 1, 7} {
+		if w := KaiserBesselDerived(4)(n, true); w != nil {
+			t.Errorf("n=%d: %v, want nil", n, w)
+		}
+	}
+}
+
 func TestDPSSOracle(t *testing.T) {
 	type dc struct {
 		m    int

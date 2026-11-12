@@ -42,6 +42,7 @@ claim that the function is as fast as SciPy's.
 - `Hamming`: `scipy.signal.windows.hamming`.
 - `Hann`: `scipy.signal.windows.hann`.
 - `Kaiser`: `scipy.signal.windows.kaiser`.
+- `KaiserBesselDerived`: `scipy.signal.windows.kaiser_bessel_derived`.
 - `Nuttall`: `scipy.signal.windows.nuttall`.
 - `Parzen`: `scipy.signal.windows.parzen`.
 - `Triang`: `scipy.signal.windows.triang`.
