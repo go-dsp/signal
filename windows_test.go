@@ -98,9 +98,11 @@ func TestKaiserBesselDerivedOracle(t *testing.T) {
 			}
 		}
 	}
-	// sym is ignored, as in scipy; an odd or negative length is not defined.
-	a, b := KaiserBesselDerived(4)(16, true), KaiserBesselDerived(4)(16, false)
-	compareVec(t, "kbd sym", a, b, 0)
+	// scipy refuses sym=False (_windows.py), as it refuses an odd length; here both
+	// return nil, the package's "cannot be generated".
+	if w := KaiserBesselDerived(4)(16, false); w != nil {
+		t.Errorf("sym false: %v, want nil", w)
+	}
 	if w := KaiserBesselDerived(4)(0, true); w == nil || len(w) != 0 {
 		t.Errorf("n=0: %v, want an empty window", w)
 	}

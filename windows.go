@@ -164,10 +164,16 @@ func Kaiser(beta float64) Window {
 		return build(n, sym, func(m int) []float64 {
 			alpha := float64(m-1) / 2
 			w := make([]float64, m)
-			i0b := special.I0(beta)
+			// I0(x)/I0(b) = I0e(x)/I0e(b) * e^(x-b), with x <= b: the exponentially
+			// scaled I0 does not overflow (I0 does above beta of about 714, where the
+			// quotient of two infinities was NaN, as in SciPy), and the exponent is
+			// never positive.
+			b := math.Abs(beta) // I0 is even
+			i0eb := special.I0e(b)
 			for i := range w {
 				r := (float64(i) - alpha) / alpha
-				w[i] = special.I0(beta*math.Sqrt(1-r*r)) / i0b
+				x := b * math.Sqrt(1-r*r)
+				w[i] = special.I0e(x) / i0eb * math.Exp(x-b)
 			}
 			return w
 		})
@@ -179,11 +185,11 @@ func Kaiser(beta float64) Window {
 // Vorbis-style MDCT codecs: the square root of the normalised running sum of a
 // Kaiser window of n/2+1 points, followed by its mirror image, so that the
 // squares of the two halves add up to one (Princen-Bradley). It is defined for an
-// even n only: an odd or negative n returns nil. The form is always symmetric:
-// sym is ignored, as in scipy.
+// even n only and symmetric only: an odd or negative n, or sym false, returns nil
+// (scipy raises for both).
 func KaiserBesselDerived(beta float64) Window {
 	return func(n int, sym bool) []float64 {
-		if n < 0 || n%2 != 0 {
+		if n < 0 || n%2 != 0 || !sym {
 			return nil
 		}
 		w := make([]float64, n)
